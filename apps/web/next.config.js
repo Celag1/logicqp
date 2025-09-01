@@ -2,7 +2,7 @@
 const nextConfig = {
   // Optimizaciones de rendimiento
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   
@@ -68,6 +68,9 @@ const nextConfig = {
       },
     ];
   },
+  
+  // Configuración para Vercel
+  output: 'standalone',
 };
 
 module.exports = nextConfig;
