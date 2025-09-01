@@ -132,11 +132,12 @@ const mockMetrics: DashboardMetric[] = [
 ];
 
 const mockTopProducts = [
-  { nombre: "Paracetamol 500mg", ventas: 156, crecimiento: 12.5, categoria: "Analgésicos" },
-  { nombre: "Vitamina C 1000mg", ventas: 134, crecimiento: 8.7, categoria: "Vitaminas" },
-  { nombre: "Ibuprofeno 400mg", ventas: 98, crecimiento: 15.2, categoria: "Antiinflamatorios" },
-  { nombre: "Omeprazol 20mg", ventas: 87, crecimiento: 6.3, categoria: "Gastrointestinales" },
-  { nombre: "Loratadina 10mg", ventas: 76, crecimiento: 9.8, categoria: "Antihistamínicos" }
+  { nombre: "Paracetamol 500mg", ventas: 1250, crecimiento: 15, categoria: "Analgésicos", porcentaje: 25 },
+  { nombre: "Ibuprofeno 400mg", ventas: 980, crecimiento: 8, categoria: "Antiinflamatorios", porcentaje: 20 },
+  { nombre: "Vitamina C 1000mg", ventas: 890, crecimiento: 22, categoria: "Vitaminas", porcentaje: 18 },
+  { nombre: "Omeprazol 20mg", ventas: 720, crecimiento: 12, categoria: "Gastritis", porcentaje: 15 },
+  { nombre: "Loratadina 10mg", ventas: 650, crecimiento: 18, categoria: "Antihistamínicos", porcentaje: 12 },
+  { nombre: "Calcio + Vitamina D", ventas: 580, crecimiento: 25, categoria: "Suplementos", porcentaje: 10 }
 ];
 
 const mockRecentOrders = [
