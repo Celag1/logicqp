@@ -17,6 +17,7 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[]
+  _hasHydrated: boolean
   addItem: (item: Omit<CartItem, 'cantidad'>) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, cantidad: number) => void
