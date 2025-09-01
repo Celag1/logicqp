@@ -66,7 +66,7 @@ export function InventoryChart({ data = mockInventoryData }: InventoryChartProps
               borderColor: getMetricColor(selectedMetric),
               backgroundColor: getMetricBackgroundColor(selectedMetric),
               tension: chartType === 'line' ? 0.4 : 0,
-              fill: chartType === 'area',
+              fill: chartType === 'line',
               borderWidth: 3,
               pointBackgroundColor: getMetricColor(selectedMetric),
               pointBorderColor: '#ffffff',
