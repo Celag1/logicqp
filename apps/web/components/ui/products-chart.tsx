@@ -134,11 +134,10 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
                   minRotation: 0
                 }
               },
-              y: {
-                grid: {
-                  color: '#e5e7eb',
-                  borderDash: [5, 5]
-                },
+                             y: {
+                 grid: {
+                   color: '#e5e7eb',
+                 },
                 ticks: {
                   color: '#6b7280',
                   font: {
