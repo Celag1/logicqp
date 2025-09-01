@@ -52,6 +52,8 @@ export function InventoryChart({ data = mockInventoryData }: InventoryChartProps
           chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
+        
         const ctx = chartRef.current.getContext('2d');
         if (!ctx) return;
 
