@@ -121,7 +121,6 @@ export function InventoryChart({ data = mockInventoryData }: InventoryChartProps
               y: {
                 grid: {
                   color: '#e5e7eb',
-                  borderDash: [5, 5]
                 },
                 ticks: {
                   color: '#6b7280',
