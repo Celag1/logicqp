@@ -120,11 +120,10 @@ export function SalesChart({ data = mockSalesData, period = 'año', onPeriodChan
                   }
                 }
               },
-              y: {
-                grid: {
-                  color: '#e5e7eb',
-                  borderDash: [5, 5]
-                },
+                             y: {
+                 grid: {
+                   color: '#e5e7eb',
+                 },
                 ticks: {
                   color: '#6b7280',
                   font: {
