@@ -439,12 +439,12 @@ export default function CatalogoPage() {
 
   const getTotalCart = () => {
     if (!cartItems || !Array.isArray(cartItems)) return 0;
-    return cartItems.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+    return (cartItems as CartItem[]).reduce((total, item) => total + (item.precio * item.cantidad), 0);
   };
 
   const getCartItemCount = () => {
     if (!cartItems || !Array.isArray(cartItems)) return 0;
-    return cartItems.reduce((total, item) => total + item.cantidad, 0);
+    return (cartItems as CartItem[]).reduce((total, item) => total + item.cantidad, 0);
   };
 
   const handleImageLoad = (productId: string) => {
@@ -671,7 +671,7 @@ export default function CatalogoPage() {
             {filteredProducts.map((product) => {
               const stockStatus = getStockStatus(product.stock_disponible);
               const CategoryIcon = getCategoryIcon(product.categoria);
-              const cartItem = cartItems && Array.isArray(cartItems) ? cartItems.find(item => item.id === product.id) : undefined;
+              const cartItem = cartItems && Array.isArray(cartItems) ? (cartItems as CartItem[]).find(item => item.id === product.id) : undefined;
               
               return (
                 <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-xl bg-white overflow-hidden transform hover:-translate-y-2">
@@ -862,7 +862,7 @@ export default function CatalogoPage() {
             </div>
             
             <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
-              {cartItems && Array.isArray(cartItems) && cartItems.slice(0, 3).map((item) => (
+              {cartItems && Array.isArray(cartItems) && (cartItems as CartItem[]).slice(0, 3).map((item) => (
                 <div key={item.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
                     <Pill className="h-5 w-5 text-blue-600" />
@@ -876,9 +876,9 @@ export default function CatalogoPage() {
                   </div>
                 </div>
               ))}
-              {cartItems && Array.isArray(cartItems) && cartItems.length > 3 && (
+              {cartItems && Array.isArray(cartItems) && (cartItems as CartItem[]).length > 3 && (
                 <div className="text-center text-sm text-gray-500 py-2">
-                  +{cartItems.length - 3} productos más
+                  +{(cartItems as CartItem[]).length - 3} productos más
                 </div>
               )}
             </div>
