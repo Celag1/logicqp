@@ -36,7 +36,7 @@ const mockSalesData: SalesData[] = [
 ];
 
 export function SalesChart({ data = mockSalesData, period = 'año', onPeriodChange }: SalesChartProps) {
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [selectedMetric, setSelectedMetric] = useState<'sales' | 'orders' | 'customers'>('sales');
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<any>(null);
@@ -68,7 +68,7 @@ export function SalesChart({ data = mockSalesData, period = 'año', onPeriodChan
               borderColor: getMetricColor(selectedMetric),
               backgroundColor: getMetricBackgroundColor(selectedMetric),
               tension: chartType === 'line' ? 0.4 : 0,
-              fill: chartType === 'area',
+                             fill: chartType === 'line',
               borderWidth: 3,
               pointBackgroundColor: getMetricColor(selectedMetric),
               pointBorderColor: '#ffffff',
@@ -231,11 +231,10 @@ export function SalesChart({ data = mockSalesData, period = 'año', onPeriodChan
               <SelectTrigger className="w-24">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="line">Línea</SelectItem>
-                <SelectItem value="bar">Barras</SelectItem>
-                <SelectItem value="area">Área</SelectItem>
-              </SelectContent>
+                             <SelectContent>
+                 <SelectItem value="line">Línea</SelectItem>
+                 <SelectItem value="bar">Barras</SelectItem>
+               </SelectContent>
             </Select>
             
             <Button variant="outline" size="sm" onClick={handleExportChart}>
