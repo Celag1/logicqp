@@ -205,7 +205,7 @@ class ProductService {
         throw error
       }
 
-      const categories = Array.from(new Set(data?.map((p: Product) => p.categoria) || []))
+      const categories = Array.from(new Set(data?.map((p: Product) => p.categoria) || [])) as string[]
       console.log('✅ Categorías obtenidas:', categories)
       return categories
     } catch (error) {
@@ -228,7 +228,7 @@ class ProductService {
         throw error
       }
 
-      const brands = Array.from(new Set(data?.map((p: Product) => p.marca) || []))
+      const brands = Array.from(new Set(data?.map((p: Product) => p.marca) || [])) as string[]
       console.log('✅ Marcas obtenidas:', brands)
       return brands
     } catch (error) {
