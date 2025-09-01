@@ -420,7 +420,7 @@ export default function DashboardPage() {
       return true;
     } catch (error) {
       console.error('Error generando PDF:', error);
-      showErrorToast('Error al generar PDF: ' + error.message);
+      showErrorToast('Error al generar PDF: ' + (error instanceof Error ? error.message : String(error)));
       return false;
     }
   };
