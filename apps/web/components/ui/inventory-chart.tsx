@@ -35,7 +35,7 @@ const mockInventoryData: InventoryData[] = [
 ];
 
 export function InventoryChart({ data = mockInventoryData }: InventoryChartProps) {
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [selectedMetric, setSelectedMetric] = useState<'stock_total' | 'stock_critico' | 'rotacion' | 'compras'>('stock_total');
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<any>(null);
