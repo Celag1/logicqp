@@ -56,6 +56,8 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
           chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
+        
         const ctx = chartRef.current.getContext('2d');
         if (!ctx) return;
 
