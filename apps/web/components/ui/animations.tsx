@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { ReactNode } from 'react';
+import { ReactNode, useState, useRef, useEffect } from 'react';
 
 // Variantes de animación predefinidas
 export const fadeInUp: Variants = {
@@ -372,7 +372,7 @@ export function Bounce({
 // Hook para animaciones basadas en scroll
 export function useScrollAnimation() {
   const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

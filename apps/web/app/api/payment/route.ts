@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (!paymentResult.success) {
       return NextResponse.json(
-        { success: false, error: paymentResult.error },
+        { success: false, error: 'error' in paymentResult ? paymentResult.error : 'Error desconocido en el procesamiento del pago' },
         { status: 400 }
       );
     }
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
       console.error('Error guardando venta en BD:', ventaError);
       // No fallar la compra por error de BD, solo logear
     } else {
-      // Guardar los items de la venta
-      const ventaItems = items.map(item => ({
+      // Guardar los items de la venta        
+      const ventaItems = items.map((item: any) => ({
         venta_id: ventaData.id,
         producto_id: item.product.id,
         producto_nombre: item.product.nombre,
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       success: true,
       invoiceData,
       emailSent,
-      message: paymentResult.message || 'Pago procesado exitosamente',
+      message: 'message' in paymentResult ? paymentResult.message : 'Pago procesado exitosamente',
     });
   } catch (error) {
     console.error('Error processing payment:', error);

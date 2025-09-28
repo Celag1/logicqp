@@ -14,6 +14,20 @@ export interface Profile {
   created_at: string;
 }
 
+// Función para convertir LocalUser a Profile
+const convertLocalUserToProfile = (user: LocalUser): Profile => ({
+  id: user.id,
+  email: user.email,
+  nombre: user.nombre,
+  apellido: user.apellido,
+  rol: user.rol as 'administrador' | 'vendedor' | 'cliente',
+  telefono: user.telefono,
+  direccion: user.direccion,
+  empresa: user.empresa,
+  email_verificado: user.email_verificado,
+  created_at: user.created_at
+});
+
 export function useAuthLocal() {
   const [user, setUser] = useState<LocalUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -33,7 +47,7 @@ export function useAuthLocal() {
           if (currentUser) {
             console.log('✅ Usuario encontrado en sesión:', currentUser.nombre);
             setUser(currentUser);
-            setProfile(currentUser);
+            setProfile(convertLocalUserToProfile(currentUser));
           }
         }
         
@@ -70,7 +84,7 @@ export function useAuthLocal() {
         
         // Actualizar estado
         setUser(loggedUser);
-        setProfile(loggedUser);
+        setProfile(convertLocalUserToProfile(loggedUser));
         
         return { user: loggedUser, error: null };
       }
@@ -109,10 +123,10 @@ export function useAuthLocal() {
   // Función para actualizar perfil
   const updateProfile = async (updates: Partial<Profile>) => {
     try {
-      if (!user) return { error: 'No hay usuario autenticado' };
+      if (!user || !profile) return { error: 'No hay usuario autenticado' };
       
       const updatedUser = { ...user, ...updates };
-      const updatedProfile = { ...profile, ...updates };
+      const updatedProfile = { ...profile, ...updates } as Profile;
       
       // Actualizar en localStorage
       saveSession(updatedUser);

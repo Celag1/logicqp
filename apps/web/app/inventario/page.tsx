@@ -38,8 +38,6 @@ import {
   QrCode,
   Loader2
 } from "lucide-react";
-
-import BarcodeInventoryScanner from "@/components/inventory/barcode-inventory-scanner";
 import { useAuth } from "@/hooks/useAuth";
 
 // Importar jsPDF dinámicamente para evitar problemas de SSR
@@ -351,8 +349,8 @@ export default function InventarioPage() {
       reportContainer.style.lineHeight = '1.4';
       
       // Calcular estadísticas adicionales
-      const categories = [...new Set(filteredInventory.map(item => item.categoria))];
-      const suppliers = [...new Set(filteredInventory.map(item => item.proveedor))];
+      const categories = Array.from(new Set(filteredInventory.map(item => item.categoria)));
+      const suppliers = Array.from(new Set(filteredInventory.map(item => item.proveedor)));
       const avgPrice = filteredInventory.reduce((sum, item) => sum + item.precio_venta, 0) / filteredInventory.length;
       const totalStockValue = filteredInventory.reduce((sum, item) => sum + (item.precio_compra * item.stock_actual), 0);
       const lowStockItems = filteredInventory.filter(item => item.stock_actual <= item.stock_minimo);
@@ -770,7 +768,7 @@ export default function InventarioPage() {
       
       // Animación de entrada
       setTimeout(() => {
-        const modalContent = modal.querySelector('div > div');
+        const modalContent = modal.querySelector('div > div') as HTMLElement;
         if (modalContent) {
           modalContent.style.transform = 'scale(1)';
           modalContent.style.opacity = '1';
@@ -1126,14 +1124,13 @@ export default function InventarioPage() {
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div 
-                                className={`h-2 rounded-full ${
+                                className={`h-2 rounded-full transition-all duration-300 ${
                                   item.stock_actual <= item.stock_minimo 
                                     ? 'bg-red-500' 
                                     : item.stock_actual > item.stock_maximo 
                                     ? 'bg-yellow-500' 
                                     : 'bg-green-500'
                                 }`}
-                                className="transition-all duration-300"
                                 style={{ 
                                   width: `${Math.min(100, (item.stock_actual / item.stock_maximo) * 100)}%` 
                                 }}

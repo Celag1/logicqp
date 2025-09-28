@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 
 // Hook para optimizar el rendimiento con debounce
 export function useDebounce<T>(value: T, delay: number): T {

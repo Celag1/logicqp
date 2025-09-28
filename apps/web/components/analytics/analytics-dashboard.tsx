@@ -227,6 +227,7 @@ const AnalyticsDashboardComponent: React.FC<AnalyticsDashboardProps> = ({ classN
                     onSelect={handleDateRangeChange}
                     numberOfMonths={2}
                     locale={es}
+                    required
                   />
                 </PopoverContent>
               </Popover>

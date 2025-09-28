@@ -67,7 +67,7 @@ class LocalDatabase {
 
   // Métodos para autenticación
   async authenticateUser(email: string, password: string) {
-    for (const user of this.users.values()) {
+    for (const user of Array.from(this.users.values())) {
       if (user.email === email && user.password === password) {
         return user;
       }
@@ -255,9 +255,9 @@ export const localSupabase: LocalSupabaseClient = {
         };
       },
 
-      async update(data: any) {
+      update(data: any) {
         return {
-          async eq(column: string, value: any): Promise<LocalSupabaseResponse<any>> {
+          eq: async (column: string, value: any): Promise<LocalSupabaseResponse<any>> => {
             try {
               console.log(`💾 Local Supabase: Actualizando ${table} donde ${column} = ${value}`);
               

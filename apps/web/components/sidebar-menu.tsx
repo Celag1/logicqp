@@ -41,7 +41,15 @@ interface SidebarMenuProps {
   onClose: () => void;
 }
 
-const navigationSections = [
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: any;
+  public: boolean;
+  roles?: string[];
+}
+
+const navigationSections: { title: string; items: MenuItem[] }[] = [
   {
     title: "Público",
     items: [
@@ -54,20 +62,20 @@ const navigationSections = [
   {
     title: "Gestión",
     items: [
-      { name: "Dashboard", href: "/dashboard", icon: BarChart3, roles: ["super_admin", "administrador", "vendedor", "inventario", "contable"] },
-      { name: "Inventario", href: "/inventario", icon: TrendingUp, roles: ["super_admin", "administrador", "inventario"] },
-      { name: "Órdenes", href: "/ordenes", icon: Receipt, roles: ["super_admin", "administrador", "vendedor", "contable"] },
-      { name: "Analytics", href: "/analytics", icon: Activity, roles: ["super_admin", "administrador", "contable"] },
-      { name: "Reportes", href: "/reportes", icon: BarChart3, roles: ["super_admin", "administrador", "contable"] },
+      { name: "Dashboard", href: "/dashboard", icon: BarChart3, public: false, roles: ["super_admin", "administrador", "vendedor", "inventario", "contable"] },
+      { name: "Inventario", href: "/inventario", icon: TrendingUp, public: false, roles: ["super_admin", "administrador", "inventario"] },
+      { name: "Órdenes", href: "/ordenes", icon: Receipt, public: false, roles: ["super_admin", "administrador", "vendedor", "contable"] },
+      { name: "Analytics", href: "/analytics", icon: Activity, public: false, roles: ["super_admin", "administrador", "contable"] },
+      { name: "Reportes", href: "/reportes", icon: BarChart3, public: false, roles: ["super_admin", "administrador", "contable"] },
     ]
   },
   {
     title: "Administración",
     items: [
-      { name: "Usuarios", href: "/usuarios", icon: Users, roles: ["super_admin", "administrador"] },
-      { name: "Configuración", href: "/configuracion", icon: Cog, roles: ["super_admin", "administrador"] },
-      { name: "Permisos", href: "/admin/permisos", icon: Shield, roles: ["super_admin"] },
-      { name: "Empresa", href: "/admin/empresa", icon: Building, roles: ["super_admin"] },
+      { name: "Usuarios", href: "/usuarios", icon: Users, public: false, roles: ["super_admin", "administrador"] },
+      { name: "Configuración", href: "/configuracion", icon: Cog, public: false, roles: ["super_admin", "administrador"] },
+      { name: "Permisos", href: "/admin/permisos", icon: Shield, public: false, roles: ["super_admin"] },
+      { name: "Empresa", href: "/admin/empresa", icon: Building, public: false, roles: ["super_admin"] },
     ]
   }
 ];
@@ -78,8 +86,8 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Obtener información real del usuario
-  const currentUserRole = profile?.rol || user?.rol || userRole;
-  const currentUserName = profile?.nombre || user?.nombre || user?.email?.split('@')[0] || 'Usuario';
+  const currentUserRole = profile?.rol || user?.role || userRole;
+  const currentUserName = profile?.nombre || user?.email?.split('@')[0] || 'Usuario';
 
 
   const handleLogout = async () => {
@@ -221,7 +229,7 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
             {navigationSections.map((section) => {
               const filteredItems = section.items.filter((item) => {
                 if (item.public) return true;
-                if (item.roles && item.roles.includes(userRole)) return true;
+                if (item.roles && item.roles.includes(currentUserRole)) return true;
                 return false;
               });
               if (filteredItems.length === 0) return null;
@@ -244,7 +252,7 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
 
                   {isExpanded && (
                     <div className="ml-4 space-y-1">
-                      {filteredItems.map((item: any) => {
+                      {filteredItems.map((item: MenuItem) => {
                         const Icon = item.icon;
                         return (
                           <Link

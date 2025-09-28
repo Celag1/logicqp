@@ -79,13 +79,13 @@ export default function ReportesPage() {
 
       // Calcular métricas reales
       const totalProductos = productos?.length || 0;
-      const stockBajo = productos?.filter(p => 
+      const stockBajo = productos?.filter((p: any) => 
         p.lotes?.[0]?.cantidad_disponible <= p.stock_minimo
       ).length || 0;
-      const stockTotal = productos?.reduce((total, p) => 
+      const stockTotal = productos?.reduce((total: number, p: any) => 
         total + (p.lotes?.[0]?.cantidad_disponible || 0), 0
       ) || 0;
-      const valorInventario = productos?.reduce((total, p) => 
+      const valorInventario = productos?.reduce((total: number, p: any) => 
         total + ((p.lotes?.[0]?.cantidad_disponible || 0) * (p.lotes?.[0]?.precio_compra || 0)), 0
       ) || 0;
 

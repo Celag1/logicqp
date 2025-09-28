@@ -106,13 +106,11 @@ export function useSupabaseQuery<T>(
 
   // Limpiar cache cuando el componente se desmonta
   useEffect(() => {
-    return () => {
-      const timeoutId = setTimeout(() => {
-        queryCache.delete(queryKey);
-      }, cacheTime);
-      
-      return () => clearTimeout(timeoutId);
-    };
+    const timeoutId = setTimeout(() => {
+      queryCache.delete(queryKey);
+    }, cacheTime);
+    
+    return () => clearTimeout(timeoutId);
   }, [queryKey, cacheTime]);
 
   return {

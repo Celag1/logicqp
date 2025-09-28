@@ -88,6 +88,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
   const [topProducts, setTopProducts] = useState<ProductData[]>([]);
+  const [chartProducts, setChartProducts] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<OrderData[]>([]);
   const [stockAlerts, setStockAlerts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,13 +120,13 @@ export default function DashboardPage() {
 
       // Calcular métricas reales
       const totalProductos = productos?.length || 0;
-      const stockBajo = productos?.filter(p => 
+      const stockBajo = productos?.filter((p: any) => 
         p.lotes?.[0]?.cantidad_disponible <= p.stock_minimo
       ).length || 0;
-      const stockTotal = productos?.reduce((total, p) => 
+      const stockTotal = productos?.reduce((total: number, p: any) => 
         total + (p.lotes?.[0]?.cantidad_disponible || 0), 0
       ) || 0;
-      const valorInventario = productos?.reduce((total, p) => 
+      const valorInventario = productos?.reduce((total: number, p: any) => 
         total + ((p.lotes?.[0]?.cantidad_disponible || 0) * (p.lotes?.[0]?.precio_compra || 0)), 0
       ) || 0;
 
@@ -183,10 +184,20 @@ export default function DashboardPage() {
         revenue: (producto.precio_venta || 0) * (Math.floor(Math.random() * 100) + 50)
       })) || [];
 
+      // Crear datos para el gráfico de productos (formato diferente)
+      const chartProductsData = productos?.slice(0, 5).map((producto: any) => ({
+        nombre: producto.nombre,
+        ventas: Math.floor(Math.random() * 100) + 50,
+        crecimiento: Math.floor(Math.random() * 20) + 5,
+        categoria: producto.categorias?.nombre || 'Sin categoría',
+        porcentaje: Math.floor(Math.random() * 20) + 5
+      })) || [];
+
       setTopProducts(realTopProducts);
+      setChartProducts(chartProductsData);
 
       // Crear alertas de stock reales
-      const realStockAlerts: StockAlert[] = productos?.filter(p => 
+      const realStockAlerts: StockAlert[] = productos?.filter((p: any) => 
         p.lotes?.[0]?.cantidad_disponible <= p.stock_minimo
       ).slice(0, 5).map((producto: any, index: number) => ({
         id: producto.id.toString(),
@@ -297,7 +308,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ProductsChart data={topProducts} maxItems={5} />
+              <ProductsChart data={chartProducts} maxItems={5} />
             </CardContent>
           </Card>
 

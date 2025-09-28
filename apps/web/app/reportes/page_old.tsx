@@ -770,7 +770,7 @@ export default function ReportesPage() {
   const [selectedType, setSelectedType] = useState("todos");
   const [selectedCategory, setSelectedCategory] = useState("todos");
   const [selectedFormat, setSelectedFormat] = useState("todos");
-  const [dateRange, setDateRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
   const [loading, setLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState('');
@@ -3146,12 +3146,12 @@ export default function ReportesPage() {
                 <DatePicker
                   placeholder="Desde"
                   value={dateRange.from}
-                  onChange={(date) => setDateRange({ ...dateRange, from: date })}
+                  onChange={(date) => setDateRange({ ...dateRange, from: date ?? undefined })}
                 />
                 <DatePicker
                   placeholder="Hasta"
                   value={dateRange.to}
-                  onChange={(date) => setDateRange({ ...dateRange, to: date })}
+                  onChange={(date) => setDateRange({ ...dateRange, to: date ?? undefined })}
                 />
               </div>
             </div>

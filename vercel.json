@@ -5,11 +5,19 @@
   "installCommand": "npm install",
   "functions": {
     "apps/web/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
     }
   },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_APP_URL": "https://logicqp.vercel.app",
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "587",
+    "SMTP_SECURE": "false",
+    "SMTP_USER": "celag3@gmail.com",
+    "NEXTAUTH_SECRET": "tu-clave-secreta-super-segura-para-produccion-2024",
+    "NEXTAUTH_URL": "https://logicqp.vercel.app"
   },
   "build": {
     "env": {

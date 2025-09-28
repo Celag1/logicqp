@@ -320,7 +320,6 @@ export default function NuevosProductosPage() {
                 <UniversalExportButton
                   data={filteredProducts}
                   title="Reporte de Nuevos Productos"
-                  filename="nuevos-productos"
                   columns={[
                     { key: 'name', label: 'Nombre' },
                     { key: 'description', label: 'Descripción' },
@@ -331,12 +330,6 @@ export default function NuevosProductosPage() {
                     { key: 'reviews', label: 'Reseñas', format: (value: number) => value.toString() },
                     { key: 'stock', label: 'Stock', format: (value: number) => value.toString() },
                     { key: 'addedDate', label: 'Fecha Agregado', format: (value: string) => new Date(value).toLocaleDateString('es-ES') }
-                  ]}
-                  summaryItems={[
-                    { label: 'Total Productos', value: filteredProducts.length },
-                    { label: 'Precio Promedio', value: `$${Math.round(filteredProducts.reduce((sum, p) => sum + p.price, 0) / filteredProducts.length)}` },
-                    { label: 'Rating Promedio', value: Math.ceil((filteredProducts.reduce((sum, p) => sum + p.rating, 0) / filteredProducts.length) * 100) / 100 },
-                    { label: 'Categorías', value: Array.from(new Set(filteredProducts.map(p => p.category))).length }
                   ]}
                 />
                 <div className="flex border border-gray-300 rounded-md">

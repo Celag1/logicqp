@@ -136,3 +136,4 @@ capturas_informe/
 
 # Archivos de configuración local
 config.local.js
+.vercel

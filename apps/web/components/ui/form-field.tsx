@@ -192,8 +192,8 @@ export function FormField({
       case "date":
         return (
           <DatePicker
-            date={value}
-            onDateChange={onChange}
+            value={value}
+            onChange={onChange}
             placeholder={placeholder}
             disabled={disabled}
           />

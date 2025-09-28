@@ -149,3 +149,5 @@ export function BarcodeScanner({ onScan, onClose, isOpen }: BarcodeScannerProps)
     </div>
   );
 }
+
+export default BarcodeScanner;

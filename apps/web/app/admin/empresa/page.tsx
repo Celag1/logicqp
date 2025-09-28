@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/lib/supabase";
 import { 
   Building, 
   Save, 
@@ -434,7 +435,7 @@ export default function EmpresaPage() {
       console.log('✅ Logo removido de Supabase');
     } catch (dbError) {
       console.error('❌ Error removiendo logo de Supabase:', dbError);
-      throw new Error(`Error al remover logo: ${dbError.message}`);
+      throw new Error(`Error al remover logo: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
     }
 
     // Guardar en localStorage como respaldo

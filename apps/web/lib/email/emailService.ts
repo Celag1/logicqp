@@ -43,7 +43,7 @@ class EmailService {
     }
 
     // Crear transporter
-    this.transporter = nodemailer.createTransporter(this.config)
+    this.transporter = nodemailer.createTransport(this.config)
   }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {

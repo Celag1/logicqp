@@ -186,9 +186,9 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
   
   // Obtener información real del usuario desde useAuth
   const currentUser = user;
-  const currentUserRole = profile?.rol || user?.rol || "cliente";
+  const currentUserRole = profile?.rol || user?.role || "cliente";
   const currentIsAuthenticated = !!user;
-  const currentUserName = profile?.nombre || user?.nombre || user?.email?.split('@')[0] || 'Usuario';
+  const currentUserName = profile?.nombre || user?.email?.split('@')[0] || 'Usuario';
   
   // Debug logs solo en desarrollo y con throttling
   useEffect(() => {
@@ -423,7 +423,10 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
                         onError={(e) => {
                           // Si falla la imagen, mostrar iniciales
                           e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling.style.display = 'flex';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
                         }}
                       />
                     ) : null}
