@@ -4,8 +4,16 @@ export interface Profile {
   id: string
   email: string
   nombre: string
+  apellido?: string
+  telefono?: string
+  direccion?: string
+  empresa?: string
   rol: RolType
   email_verified: boolean
+  email_verificado?: boolean
+  telefono_verificado?: boolean
+  avatar?: string
+  foto_url?: string
   created_at: string
   updated_at: string
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSafeCart } from "@/hooks/useSafeCart";
 import SuccessModal from "@/components/success-modal";
+import { notificationService, NotificationData } from "@/lib/services/notifications";
 import { 
   ShoppingCart, 
   CreditCard, 
@@ -36,6 +37,25 @@ export default function CheckoutPage() {
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [modalData, setModalData] = useState({
+    total: 0,
+    itemCount: 0
+  });
+  
+  // Estado completamente independiente para el modal
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    orderNumber: "",
+    total: 0,
+    itemCount: 0
+  });
+
+  // Estado para notificaciones
+  const [notificationStatus, setNotificationStatus] = useState({
+    email: false,
+    sms: false,
+    sending: false
+  });
   
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -56,20 +76,130 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCheckout = () => {
+  // Función para enviar notificaciones
+  const sendNotifications = async (orderNumber: string, total: number, itemCount: number) => {
+    try {
+      setNotificationStatus(prev => ({ ...prev, sending: true }));
+      
+      console.log('📬 Enviando notificaciones...');
+      
+      // Preparar datos para las notificaciones
+      const notificationData: NotificationData = {
+        orderNumber,
+        customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        total,
+        items: cartItems.map(item => ({
+          name: item.nombre,
+          quantity: item.cantidad,
+          price: item.precio
+        })),
+        shippingAddress: `${formData.address}, ${formData.city}, ${formData.postalCode}`,
+        estimatedDelivery: shippingMethod === "express" ? "1-2 días hábiles" : "3-5 días hábiles"
+      };
+
+      // Enviar todas las notificaciones
+      const results = await notificationService.sendAllNotifications(notificationData);
+      
+      setNotificationStatus({
+        email: results.email,
+        sms: results.sms,
+        sending: false
+      });
+
+      console.log('📊 Resultados de notificaciones:', results);
+      
+      // Mostrar toast de confirmación
+      if (results.email || results.sms) {
+        console.log('✅ Notificaciones enviadas exitosamente');
+      } else {
+        console.log('⚠️ Algunas notificaciones fallaron');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al enviar notificaciones:', error);
+      setNotificationStatus(prev => ({ ...prev, sending: false }));
+    }
+  };
+
+  const handleCheckout = async () => {
     // Generar número de orden único
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     const newOrderNumber = `LQP-${timestamp}-${random}`;
     
+    // Guardar datos del modal antes de limpiar el carrito
+    const currentTotal = getTotal() + (shippingMethod === "standard" ? 2.50 : shippingMethod === "express" ? 5.00 : 0) + (getTotal() * 0.15);
+    const currentItemCount = cartItems.length;
+    
+    console.log('Checkout: Abriendo modal con datos:', { newOrderNumber, currentTotal, currentItemCount });
+    
+    // Usar estado independiente para el modal
+    setModalState({
+      isOpen: true,
+      orderNumber: newOrderNumber,
+      total: currentTotal,
+      itemCount: currentItemCount
+    });
+    
+    // También mantener los estados originales para compatibilidad
     setOrderNumber(newOrderNumber);
+    setModalData({
+      total: currentTotal,
+      itemCount: currentItemCount
+    });
     setShowSuccessModal(true);
     
-    // Limpiar carrito después de mostrar el modal
-    setTimeout(() => {
-      clearCart();
-    }, 1000);
+    // Enviar notificaciones
+    await sendNotifications(newOrderNumber, currentTotal, currentItemCount);
+    
+    // NO limpiar el carrito automáticamente - se limpiará cuando se cierre el modal
+    console.log('Checkout: Modal abierto - carrito se mantendrá hasta cierre manual');
   };
+
+  // Efecto para mantener el modal abierto hasta que se cierre manualmente
+  useEffect(() => {
+    if (showSuccessModal) {
+      // El modal permanecerá abierto hasta que se cierre manualmente
+      console.log('Modal de éxito abierto - permanecerá visible hasta cierre manual');
+    }
+  }, [showSuccessModal]);
+
+  // Función para cerrar el modal manualmente
+  const handleCloseModal = () => {
+    console.log('Cerrando modal manualmente');
+    setShowSuccessModal(false);
+    setModalState(prev => ({ ...prev, isOpen: false }));
+    
+    // Limpiar carrito cuando se cierre el modal
+    console.log('Limpiando carrito al cerrar modal');
+    clearCart();
+  };
+
+  // Función para ir al dashboard y cerrar el modal
+  const handleGoToDashboard = () => {
+    console.log('Yendo al dashboard y cerrando modal');
+    setShowSuccessModal(false);
+    setModalState(prev => ({ ...prev, isOpen: false }));
+    
+    // Limpiar carrito antes de ir al dashboard
+    console.log('Limpiando carrito antes de ir al dashboard');
+    clearCart();
+    
+    // Redirigir al dashboard
+    window.location.href = '/dashboard';
+  };
+
+  // Debug: Monitorear cambios en el estado del modal
+  useEffect(() => {
+    console.log('Estado del modal:', { showSuccessModal, orderNumber, modalData });
+  }, [showSuccessModal, orderNumber, modalData]);
+
+  // Debug: Monitorear estado independiente del modal
+  useEffect(() => {
+    console.log('Estado independiente del modal:', modalState);
+  }, [modalState]);
 
   // Mostrar estado de carga durante la hidratación
   if (!isHydrated) {
@@ -357,7 +487,28 @@ export default function CheckoutPage() {
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
-                        <span className="text-sm font-medium min-w-[20px] text-center">{item.cantidad}</span>
+                        <Input
+                          type="number"
+                          min="1"
+                          max={item.stock_disponible}
+                          value={item.cantidad}
+                          onChange={(e) => {
+                            const newQuantity = parseInt(e.target.value) || 1;
+                            if (newQuantity >= 1 && newQuantity <= item.stock_disponible) {
+                              updateQuantity(item.id, newQuantity);
+                            }
+                          }}
+                          onBlur={(e) => {
+                            const newQuantity = parseInt(e.target.value) || 1;
+                            if (newQuantity < 1) {
+                              updateQuantity(item.id, 1);
+                            } else if (newQuantity > item.stock_disponible) {
+                              updateQuantity(item.id, item.stock_disponible);
+                            }
+                          }}
+                          className="h-6 w-12 text-center text-sm font-medium border-gray-300 focus:border-blue-400 focus:ring-blue-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          title={`Cantidad (máximo: ${item.stock_disponible})`}
+                        />
                         <Button
                           size="sm"
                           variant="outline"
@@ -393,14 +544,14 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>IVA (12%):</span>
-                    <span>${(getTotal() * 0.12).toFixed(2)}</span>
+                    <span>IVA (15%):</span>
+                    <span>${(getTotal() * 0.15).toFixed(2)}</span>
                   </div>
                   <div className="border-t border-gray-200 pt-2">
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total:</span>
                       <span className="text-green-600">
-                        ${(getTotal() + (shippingMethod === "standard" ? 2.50 : shippingMethod === "express" ? 5.00 : 0) + (getTotal() * 0.12)).toFixed(2)}
+                        ${(getTotal() + (shippingMethod === "standard" ? 2.50 : shippingMethod === "express" ? 5.00 : 0) + (getTotal() * 0.15)).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -435,11 +586,13 @@ export default function CheckoutPage() {
 
       {/* Modal de éxito */}
       <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        orderNumber={orderNumber}
-        total={getTotal() + (shippingMethod === "standard" ? 2.50 : shippingMethod === "express" ? 5.00 : 0) + (getTotal() * 0.12)}
-        itemCount={cartItems.length}
+        isOpen={modalState.isOpen}
+        onClose={handleCloseModal}
+        onGoToDashboard={handleGoToDashboard}
+        orderNumber={modalState.orderNumber}
+        total={modalState.total}
+        itemCount={modalState.itemCount}
+        notificationStatus={notificationStatus}
       />
     </div>
   );

@@ -1,0 +1,144 @@
+{
+  "users": [
+    {
+      "id": "532f55e3-adf9-4d33-85bf-714291aaec7b",
+      "email": "celag3@gmail.com",
+      "nombre": "Celso",
+      "apellido": "Aguirre",
+      "rol": "super_admin",
+      "telefono": "+593 99 876 9259",
+      "direccion": "Av. Bolivariana 1441 y Genovesa, Ambato, Ecuador",
+      "empresa": "IngSoft S.A.",
+      "email_verificado": true,
+      "telefono_verificado": true,
+      "foto_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QMKRXhpZgAATU0AKgAAAAgABAE7AAIAAAAVAAABSodpAAQAAAABAAABYJydAAEAAAAqAAAC2OocAAcAAAEMAAAAPgAAAAAc6gAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ0VMU08gQUdVSVJSRSBRVUlOREUAAAAFkAMAAgAAABQAAAKukAQAAgAAABQAAALCkpEAAgAAAAM4MwAAkpIAAgAAAAM4MwAA6hwABwAAAQwAAAGiAAAAABzqAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAyMDI0OjAxOjE4IDEwOjEyOjQwKzAwOjAw",
+      "created_at": "2025-08-30T20:51:37.906828+00:00",
+      "updated_at": "2025-09-17T03:38:44.378Z"
+    },
+    {
+      "id": "admin-001",
+      "email": "admin@logicqp.com",
+      "nombre": "Administrador",
+      "apellido": "Sistema",
+      "rol": "administrador",
+      "telefono": "+593 99 000 0001",
+      "direccion": "Guayaquil, Ecuador",
+      "empresa": "LogicQP",
+      "email_verificado": true,
+      "telefono_verificado": true,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "vendedor-001",
+      "email": "vendedor@logicqp.com",
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "rol": "vendedor",
+      "telefono": "+593 99 000 0002",
+      "direccion": "Quito, Ecuador",
+      "empresa": "LogicQP",
+      "email_verificado": true,
+      "telefono_verificado": false,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "empresas": [
+    {
+      "id": "empresa-001",
+      "nombre": "LogicQP",
+      "logo_url": "/logo-logicqp.png",
+      "direccion": "Guayaquil, Ecuador",
+      "telefono": "+593 4 123 4567",
+      "email": "info@logicqp.com",
+      "ruc": "1234567890001",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "productos": [
+    {
+      "id": "prod-001",
+      "codigo": "MED-001",
+      "nombre": "Paracetamol 500mg",
+      "descripcion": "Analgésico y antipirético",
+      "categoria": "Medicamentos",
+      "precio": 0.5,
+      "stock": 1000,
+      "stock_minimo": 50,
+      "unidad_medida": "caja",
+      "proveedor": "Farmacéutica ABC",
+      "activo": true,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "prod-002",
+      "codigo": "MED-002",
+      "nombre": "Ibuprofeno 400mg",
+      "descripcion": "Antiinflamatorio no esteroideo",
+      "categoria": "Medicamentos",
+      "precio": 0.75,
+      "stock": 500,
+      "stock_minimo": 25,
+      "unidad_medida": "caja",
+      "proveedor": "Farmacéutica XYZ",
+      "activo": true,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "ventas": [],
+  "venta_items": [],
+  "clientes": [
+    {
+      "id": "cliente-001",
+      "nombre": "María",
+      "apellido": "González",
+      "email": "maria.gonzalez@email.com",
+      "telefono": "+593 99 123 4567",
+      "direccion": "Av. Principal 123, Quito",
+      "ruc": "1234567890001",
+      "activo": true,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "proveedores": [
+    {
+      "id": "prov-001",
+      "nombre": "Farmacéutica ABC",
+      "contacto": "Dr. Juan Pérez",
+      "email": "contacto@farmaceutica-abc.com",
+      "telefono": "+593 4 234 5678",
+      "direccion": "Av. Industrial 456, Guayaquil",
+      "ruc": "0987654321001",
+      "activo": true,
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "inventario": [],
+  "reportes": [],
+  "configuracion": [
+    {
+      "id": "config-001",
+      "clave": "empresa_nombre",
+      "valor": "LogicQP",
+      "descripcion": "Nombre de la empresa",
+      "tipo": "string",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "config-002",
+      "clave": "impuesto_iva",
+      "valor": "12",
+      "descripcion": "Porcentaje de IVA",
+      "tipo": "number",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "updated_at": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}

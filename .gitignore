@@ -1,27 +1,28 @@
 # Dependencies
 node_modules/
 .pnpm-store/
-.pnpm-debug.log*
-
-# Production builds
-.next/
-out/
-dist/
-build/
 
 # Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.production
+.env.development
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # Runtime data
 pids
@@ -102,9 +103,36 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Vercel
-.vercel
+# Backup files
+*.backup
+*.bak
+backup_*/
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+# Test files
+test-*.js
+test-*.json
+*.test.js
+*.spec.js
+
+# Documentation files (keep only essential)
+*.md
+!README.md
+!CHANGELOG.md
+
+# Scripts temporales
+*.bat
+*.ps1
+*.sh
+
+# Database dumps
+*.sql
+!supabase/migrations/*.sql
+
+# Capturas y archivos de desarrollo
+capturas_informe/
+*.docx
+*.html
+*.pdf
+
+# Archivos de configuración local
+config.local.js

@@ -1,35 +1,47 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useSafeCart } from "@/hooks/useSafeCart";
-import { CartItem } from "@/hooks/useCart";
-import NotificationToast from "@/components/notification-toast";
-import { playAddToCartSound, triggerHapticFeedback } from "@/components/sound-effects";
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { 
+  ShoppingCart, 
+  Plus, 
+  Minus, 
+  Trash2, 
   Search, 
+  Filter, 
   Grid, 
   List, 
-  Camera, 
-  Barcode, 
+  Heart, 
   Star, 
-  ShoppingCart,
-  Eye,
-  Heart,
-  TrendingUp,
-  Zap,
-  Pill,
-  Sparkles,
+  Package, 
+  TrendingUp, 
+  Award, 
   Shield,
-  AlertTriangle,
+  SlidersHorizontal,
+  X,
+  CreditCard,
+  Banknote,
+  Smartphone,
+  Mail,
+  Printer,
   CheckCircle,
-  Plus,
-  Minus
-} from "lucide-react";
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Zap,
+  Crown,
+  Gem,
+  Flame,
+  Rocket
+} from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 interface Product {
   id: string;
@@ -40,876 +52,1324 @@ interface Product {
   marca: string;
   categoria: string;
   stock_disponible: number;
-  imagen_url?: string;
-  rating?: number;
-  reviews?: number;
+  rating: number;
+  reviews: number;
+  imagen_url: string;
 }
 
-// Mock data - En producción esto vendría de la API
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    codigo: "QPH-001",
-    nombre: "Paracetamol 500mg",
-    descripcion: "Analgésico y antipirético para aliviar dolor y fiebre",
-    precio: 2.50,
-    marca: "Qualipharm",
-    categoria: "Analgésicos",
-    stock_disponible: 150,
-    rating: 4.8,
-    reviews: 127,
-    imagen_url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "2",
-    codigo: "QPH-002",
-    nombre: "Ibuprofeno 400mg",
-    descripcion: "Antiinflamatorio no esteroideo para dolor e inflamación",
-    precio: 3.20,
-    marca: "Qualipharm",
-    categoria: "Antiinflamatorios",
-    stock_disponible: 89,
-    rating: 4.6,
-    reviews: 95,
-    imagen_url: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "3",
-    codigo: "QPH-003",
-    nombre: "Vitamina C 1000mg",
-    descripcion: "Suplemento vitamínico para fortalecer el sistema inmune",
-    precio: 8.90,
-    marca: "Qualipharm",
-    categoria: "Vitaminas",
-    stock_disponible: 200,
-    rating: 4.9,
-    reviews: 203,
-    imagen_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "4",
-    codigo: "QPH-004",
-    nombre: "Omeprazol 20mg",
-    descripcion: "Protector gástrico para úlceras y reflujo",
-    precio: 12.50,
-    marca: "Qualipharm",
-    categoria: "Gastrointestinales",
-    stock_disponible: 67,
-    rating: 4.7,
-    reviews: 156,
-    imagen_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "5",
-    codigo: "QPH-005",
-    nombre: "Loratadina 10mg",
-    descripcion: "Antihistamínico para alergias sin somnolencia",
-    precio: 6.80,
-    marca: "Qualipharm",
-    categoria: "Antihistamínicos",
-    stock_disponible: 120,
-    rating: 4.5,
-    reviews: 89,
-    imagen_url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "6",
-    codigo: "QPH-006",
-    nombre: "Aspirina 100mg",
-    descripcion: "Antiagregante plaquetario para prevención cardiovascular",
-    precio: 4.20,
-    marca: "Qualipharm",
-    categoria: "Cardiovasculares",
-    stock_disponible: 75,
-    rating: 4.4,
-    reviews: 112,
-    imagen_url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "7",
-    codigo: "QPH-007",
-    nombre: "Salbutamol 100mcg",
-    descripcion: "Broncodilatador para crisis asmáticas",
-    precio: 15.30,
-    marca: "Qualipharm",
-    categoria: "Respiratorios",
-    stock_disponible: 45,
-    rating: 4.8,
-    reviews: 178,
-    imagen_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "8",
-    codigo: "QPH-008",
-    nombre: "Metformina 500mg",
-    descripcion: "Antidiabético oral para control de glucosa",
-    precio: 18.90,
-    marca: "Qualipharm",
-    categoria: "Endocrinológicos",
-    stock_disponible: 60,
-    rating: 4.6,
-    reviews: 134,
-    imagen_url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "9",
-    codigo: "QPH-009",
-    nombre: "Dermatol 2%",
-    descripcion: "Crema tópica para tratamiento de afecciones dermatológicas",
-    precio: 22.50,
-    marca: "Qualipharm",
-    categoria: "Dermatológicos",
-    stock_disponible: 85,
-    rating: 4.7,
-    reviews: 167,
-    imagen_url: "https://images.unsplash.com/photo-1550572017-edd951aa4f39?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "10",
-    codigo: "QPH-010",
-    nombre: "Oftalmic Plus",
-    descripcion: "Gotas oftálmicas para alivio de irritación ocular",
-    precio: 28.90,
-    marca: "Qualipharm",
-    categoria: "Oftalmológicos",
-    stock_disponible: 42,
-    rating: 4.8,
-    reviews: 198,
-    imagen_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "11",
-    codigo: "QPH-011",
-    nombre: "Antibiotico XR",
-    descripcion: "Antibiótico de amplio espectro para infecciones bacterianas",
-    precio: 45.60,
-    marca: "Qualipharm",
-    categoria: "Antibióticos",
-    stock_disponible: 38,
-    rating: 4.9,
-    reviews: 234,
-    imagen_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  },
-  {
-    id: "12",
-    codigo: "QPH-012",
-    nombre: "Hormona Plus",
-    descripcion: "Terapia hormonal para desequilibrios endocrinológicos",
-    precio: 89.90,
-    marca: "Qualipharm",
-    categoria: "Hormonales",
-    stock_disponible: 25,
-    rating: 4.6,
-    reviews: 156,
-    imagen_url: "https://images.unsplash.com/photo-1550572017-edd951aa4f39?w=300&h=300&fit=crop&crop=center&q=80&auto=format"
-  }
-];
+interface CartItem {
+  product: Product;
+  quantity: number;
+  subtotal: number;
+}
 
-const categories = [
-  "Todas",
-  "Analgésicos",
-  "Antiinflamatorios", 
-  "Antibióticos",
-  "Antihistamínicos",
-  "Vitaminas",
-  "Dermatológicos",
-  "Oftalmológicos",
-  "Cardiovasculares",
-  "Gastrointestinales",
-  "Respiratorios",
-  "Antidiabéticos",
-  "Endocrinológicos",
-  "Hormonales"
-];
-
-const brands = ["Todas", "Qualipharm", "Genérico"];
+type SortOption = 'nombre' | 'precio' | 'stock_disponible' | 'rating';
+type SortOrder = 'asc' | 'desc';
 
 export default function CatalogoPage() {
-  const [products] = useState<Product[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const { user } = useAuth();
+  
+  // Estilos CSS personalizados para el scrollbar
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #3b82f6 #f1f5f9;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 5px;
+        margin: 5px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+        border-radius: 5px;
+        border: 2px solid #f1f5f9;
+        min-height: 20px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #2563eb 0%, #7c3aed 100%);
+        border: 2px solid #e2e8f0;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:active {
+        background: linear-gradient(180deg, #1d4ed8 0%, #6d28d9 100%);
+      }
+      .custom-scrollbar::-webkit-scrollbar-corner {
+        background: #f1f5f9;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      try {
+        document.head.removeChild(style);
+      } catch (e) {
+        // Element already removed
+      }
+    };
+  }, []);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>(['Todas']);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todas");
-  const [selectedBrand, setSelectedBrand] = useState("Todas");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [sortBy, setSortBy] = useState("relevance");
-  const [showScanner, setShowScanner] = useState(false);
-  const [imageLoading, setImageLoading] = useState<{[key: string]: boolean}>({});
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const { items: cartItems, addItem, updateQuantity, removeItem, getTotal, getItemCount } = useSafeCart();
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<SortOption>('nombre');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [showProductDetail, setShowProductDetail] = useState<Product | null>(null);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [shippingAddress, setShippingAddress] = useState('');
+  const [shippingCity, setShippingCity] = useState('');
+  const [shippingNotes, setShippingNotes] = useState('');
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [paymentError, setPaymentError] = useState<string>('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
-  // Inicializar estado de carga de imágenes con lazy loading
+  // Función para cargar productos reales desde Supabase
+  const loadProducts = useCallback(async () => {
+    try {
+      console.log('🚀 Iniciando loadProducts...');
+      setLoading(true);
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), 10000)
+      );
+
+      console.log('📡 Ejecutando consulta a Supabase...');
+      // Crear un cliente de Supabase sin autenticación para la consulta de productos
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabasePublic = createClient(
+        'http://127.0.0.1:54321',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+      );
+      
+      const queryPromise = supabasePublic
+        .from('productos')
+        .select(`
+          *,
+          categorias(nombre),
+          proveedores(nombre),
+          lotes(
+            id,
+            cantidad_disponible,
+            fecha_vencimiento
+          )
+        `);
+
+      const { data: productos, error: productosError } = await Promise.race([
+        queryPromise,
+        timeoutPromise
+      ]) as any;
+
+      console.log('🔍 Debug catálogo:');
+      console.log('Productos recibidos:', productos);
+      console.log('Error:', productosError);
+      console.log('Cantidad de productos:', productos?.length || 0);
+
+      if (productosError) {
+        console.error('Error cargando productos:', productosError);
+        setProducts([]);
+        setFilteredProducts([]);
+        setCategories(['Todas']);
+        return;
+      }
+
+      if (!productos || productos.length === 0) {
+        console.warn('⚠️ No se encontraron productos en la base de datos');
+        setProducts([]);
+        setFilteredProducts([]);
+        setCategories(['Todas']);
+        return;
+      }
+
+      const realProducts: Product[] = productos?.map((producto: any) => ({
+        id: producto.id.toString(),
+        codigo: producto.codigo,
+        nombre: producto.nombre,
+        descripcion: producto.descripcion || 'Sin descripción',
+        precio: producto.precio || 0,
+        marca: producto.proveedores?.nombre || 'Qualipharm',
+        categoria: producto.categorias?.nombre || 'Sin categoría',
+        stock_disponible: producto.lotes?.[0]?.cantidad_disponible || producto.stock || 0,
+        rating: 4.5,
+        reviews: 25,
+        imagen_url: producto.foto_url || `https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=400&fit=crop&crop=center&q=80&auto=format&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`
+      })) || [];
+
+      setProducts(realProducts);
+      setFilteredProducts(realProducts);
+
+      const uniqueCategories = ['Todas', ...Array.from(new Set(realProducts.map(p => p.categoria)))];
+      setCategories(uniqueCategories);
+
+      console.log('✅ Productos cargados exitosamente:', realProducts.length);
+      console.log('✅ Categorías:', uniqueCategories);
+
+    } catch (error) {
+      console.error('❌ Error cargando productos:', error);
+      setProducts([]);
+      setFilteredProducts([]);
+      setCategories(['Todas']);
+    } finally {
+      console.log('🏁 Finalizando loadProducts, setLoading(false)');
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const initialLoadingState = products.reduce((acc, product) => {
-      if (product.imagen_url) {
-        acc[product.id] = true;
-      }
-      return acc;
-    }, {} as {[key: string]: boolean});
-    setImageLoading(initialLoadingState);
+    loadProducts();
+  }, [loadProducts]);
 
-    // Preload primeras 4 imágenes para mejor UX con timeout
-    const preloadImages = products.slice(0, 4);
-    preloadImages.forEach(product => {
-      if (product.imagen_url) {
-        const img = new Image();
-        const timeoutId = setTimeout(() => {
-          // Si la imagen tarda más de 5 segundos, marcar como fallida
-          setImageLoading(prev => ({ ...prev, [product.id]: false }));
-          console.warn(`Image load timeout for product ${product.id}`);
-        }, 5000);
-        
-        img.onload = () => {
-          clearTimeout(timeoutId);
-          setImageLoading(prev => ({ ...prev, [product.id]: false }));
-        };
-        img.onerror = () => {
-          clearTimeout(timeoutId);
-          setImageLoading(prev => ({ ...prev, [product.id]: false }));
-          // Marcar como fallida para mostrar icono por defecto
-          product.imagen_url = undefined;
-        };
-        
-        img.src = product.imagen_url;
-      }
-    });
-  }, [products]);
-
-  // Filtrado inteligente con IA
+  // Filtros y búsqueda
   useEffect(() => {
     let filtered = products;
 
-    // Filtro por búsqueda (inteligente)
+    // Filtro por búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(product => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          product.nombre.toLowerCase().includes(searchLower) ||
-          product.descripcion.toLowerCase().includes(searchLower) ||
-          product.codigo.toLowerCase().includes(searchLower) ||
-          product.categoria.toLowerCase().includes(searchLower) ||
-          product.marca.toLowerCase().includes(searchLower)
-        );
-      });
+      filtered = filtered.filter(product =>
+        product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.marca.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
     // Filtro por categoría
-    if (selectedCategory !== "Todas") {
+    if (selectedCategory !== 'Todas') {
       filtered = filtered.filter(product => product.categoria === selectedCategory);
     }
 
-    // Filtro por marca
-    if (selectedBrand !== "Todas") {
-      filtered = filtered.filter(product => product.marca === selectedBrand);
+    // Filtro por rango de precio
+    filtered = filtered.filter(product => 
+      product.precio >= priceRange[0] && product.precio <= priceRange[1]
+    );
+
+    // Filtro por marcas
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(product => selectedBrands.includes(product.marca));
     }
 
-    // Ordenamiento inteligente
-    switch (sortBy) {
-      case "price_low":
-        filtered = [...filtered].sort((a, b) => a.precio - b.precio);
-        break;
-      case "price_high":
-        filtered = [...filtered].sort((a, b) => b.precio - a.precio);
-        break;
-      case "rating":
-        filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case "stock":
-        filtered = [...filtered].sort((a, b) => b.stock_disponible - a.stock_disponible);
-        break;
-      case "name":
-        filtered = [...filtered].sort((a, b) => a.nombre.localeCompare(b.nombre));
-        break;
-      default:
-        // Ordenamiento por relevancia (IA-powered)
-        filtered = [...filtered].sort((a, b) => {
-          let scoreA = 0;
-          let scoreB = 0;
+    // Ordenamiento
+    filtered.sort((a, b) => {
+      let aValue: any = a[sortBy];
+      let bValue: any = b[sortBy];
 
-          // Score por rating
-          scoreA += (a.rating || 0) * 10;
-          scoreB += (b.rating || 0) * 10;
+      if (sortBy === 'precio' || sortBy === 'stock_disponible' || sortBy === 'rating') {
+        aValue = Number(aValue);
+        bValue = Number(bValue);
+      } else {
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
+      }
 
-          // Score por stock (preferir productos disponibles)
-          scoreA += Math.min(a.stock_disponible, 100);
-          scoreB += Math.min(b.stock_disponible, 100);
-
-          // Score por marca Qualipharm
-          if (a.marca === "Qualipharm") scoreA += 50;
-          if (b.marca === "Qualipharm") scoreB += 50;
-
-          return scoreB - scoreA;
-        });
-    }
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
 
     setFilteredProducts(filtered);
-  }, [products, searchTerm, selectedCategory, selectedBrand, sortBy]);
+  }, [products, searchTerm, selectedCategory, priceRange, selectedBrands, sortBy, sortOrder]);
 
-  const handleAddToCart = (product: Product) => {
-    addItem({
-      id: product.id,
-      codigo: product.codigo,
-      nombre: product.nombre,
-      precio: product.precio,
-      stock_disponible: product.stock_disponible,
-      imagen_url: product.imagen_url,
-      categoria: product.categoria,
-      marca: product.marca
+  // Estadísticas
+  const stats = useMemo(() => {
+    const totalProducts = products.length;
+    const totalValue = products.reduce((sum, product) => sum + (product.precio * product.stock_disponible), 0);
+    const avgRating = products.reduce((sum, product) => sum + product.rating, 0) / totalProducts || 0;
+    const lowStock = products.filter(product => product.stock_disponible < 10).length;
+
+    return { totalProducts, totalValue, avgRating, lowStock };
+  }, [products]);
+
+  // Funciones del carrito
+  const addToCart = (product: Product, quantity: number = 1) => {
+    // Validar stock disponible
+    if (product.stock_disponible <= 0) {
+      alert('❌ Este producto no está disponible en stock');
+      return;
+    }
+
+    setCart(prev => {
+      const existingItem = prev.find(item => item.product.id === product.id);
+      const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+      
+      // Validar que no exceda el stock disponible
+      if (newQuantity > product.stock_disponible) {
+        alert(`❌ Solo hay ${product.stock_disponible} unidades disponibles de este producto`);
+        return prev;
+      }
+
+      if (existingItem) {
+        return prev.map(item =>
+          item.product.id === product.id
+            ? { ...item, quantity: newQuantity, subtotal: newQuantity * product.precio }
+            : item
+        );
+      } else {
+        return [...prev, { product, quantity, subtotal: quantity * product.precio }];
+      }
     });
-    
-    // Efectos de sonido y vibración
-    playAddToCartSound();
-    triggerHapticFeedback();
-    
-    // Mostrar toast elegante
-    setToastMessage(`Se agregó ${product.nombre} al carrito`);
-    setShowToast(true);
   };
 
-  const handleQuickView = (product: Product) => {
-    // Modal de vista rápida elegante
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-    modal.innerHTML = `
-      <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform transition-all duration-300 scale-95 opacity-0">
-        <div class="flex justify-between items-start mb-4">
-          <h3 class="text-xl font-bold text-gray-900">${product.nombre}</h3>
-          <button class="text-gray-400 hover:text-gray-600" onclick="this.closest('.fixed').remove()">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="space-y-4">
-          <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
-            <p class="text-gray-700">${product.descripcion}</p>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="text-center p-3 bg-blue-50 rounded-lg">
-              <p class="text-sm text-gray-600">Precio</p>
-              <p class="text-2xl font-bold text-blue-600">$${product.precio.toFixed(2)}</p>
-            </div>
-            <div class="text-center p-3 bg-green-50 rounded-lg">
-              <p class="text-sm text-gray-600">Stock</p>
-              <p class="text-2xl font-bold text-green-600">${product.stock_disponible}</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center space-x-2">
-            <Star class="h-5 w-5 text-yellow-400 fill-current" />
-            <span class="font-medium">${product.rating}</span>
-            <span class="text-gray-500">(${product.reviews} reseñas)</span>
-          </div>
+  const updateQuantity = (productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+
+    // Validar stock disponible
+    const product = products.find(p => p.id === productId);
+    if (product && quantity > product.stock_disponible) {
+      alert(`❌ Solo hay ${product.stock_disponible} unidades disponibles de este producto`);
+      return;
+    }
+
+    setCart(prev =>
+      prev.map(item =>
+        item.product.id === productId
+          ? { ...item, quantity, subtotal: quantity * item.product.precio }
+          : item
+      )
+    );
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart(prev => prev.filter(item => item.product.id !== productId));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      alert('❌ El carrito está vacío');
+      return;
+    }
+    
+    // Validar que todos los productos tengan stock suficiente
+    const outOfStock = cart.filter(item => item.quantity > item.product.stock_disponible);
+    if (outOfStock.length > 0) {
+      alert(`❌ Los siguientes productos no tienen stock suficiente:\n${outOfStock.map(item => `- ${item.product.nombre} (disponible: ${item.product.stock_disponible})`).join('\n')}`);
+      return;
+    }
+    
+    // Pre-llenar datos si el usuario está autenticado
+    if (user?.email) {
+      setCustomerEmail(user.email);
+      setCustomerName(user.user_metadata?.full_name || '');
+    }
+    
+    setShowPaymentModal(true);
+  };
+
+  const handlePayment = async () => {
+    if (!selectedPaymentMethod) {
+      setPaymentError('❌ Por favor selecciona una forma de pago');
+      return;
+    }
+    if (!customerEmail) {
+      setPaymentError('❌ Por favor ingresa tu email');
+      return;
+    }
+
+    if (!customerName) {
+      setPaymentError('❌ Por favor ingresa tu nombre completo');
+      return;
+    }
+
+    if (!customerPhone) {
+      setPaymentError('❌ Por favor ingresa tu teléfono');
+      return;
+    }
+
+    if (!shippingAddress) {
+      setPaymentError('❌ Por favor ingresa la dirección de envío');
+      return;
+    }
+
+    if (!shippingCity) {
+      setPaymentError('❌ Por favor ingresa la ciudad de envío');
+      return;
+    }
+    
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+      setPaymentError('❌ Por favor ingresa un email válido');
+      return;
+    }
+
+    setPaymentLoading(true);
+    setPaymentError('');
+
+    try {
+      // Si el usuario está logueado, usar sus datos del perfil
+      const finalCustomerName = user ? `${user.user_metadata?.nombre || ''} ${user.user_metadata?.apellido || ''}`.trim() || customerName : customerName;
+      const finalCustomerPhone = user ? user.user_metadata?.telefono || customerPhone : customerPhone;
+      const finalCustomerEmail = user ? user.email : customerEmail;
+
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentMethod: selectedPaymentMethod,
+          items: cart,
+          customerEmail: finalCustomerEmail,
+          customerName: finalCustomerName,
+          customerPhone: finalCustomerPhone,
+          shippingAddress,
+          shippingCity,
+          shippingNotes,
+          total: cartTotal,
+          userId: user?.id || null
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (selectedPaymentMethod === 'tarjeta' && data.clientSecret) {
+          // Para tarjetas, mostrar el formulario de Stripe
+          setShowPaymentModal(false);
+          setShowInvoice(true);
+          setInvoiceData(data.invoiceData);
+        } else {
+          // Para otros métodos, mostrar factura directamente
+          setInvoiceData(data.invoiceData);
+          setShowPaymentModal(false);
+          setShowInvoice(true);
+        }
+      } else {
+        setPaymentError(data.error || 'Error procesando el pago');
+      }
+    } catch (error) {
+      setPaymentError('Error de conexión. Intenta nuevamente.');
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handlePrintInvoice = () => {
+    window.print();
+  };
+
+  const handleEmailInvoice = async () => {
+    // Mostrar mensaje de carga
+    const loadingMessage = document.createElement('div');
+    loadingMessage.innerHTML = `
+      <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px;">
+          <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+          <h3 style="margin: 0 0 10px; color: #333;">📧 Enviando Venta...</h3>
+          <p style="margin: 0; color: #666;">Procesando y enviando venta por email</p>
         </div>
       </div>
+      <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
     `;
-    document.body.appendChild(modal);
-    
-    setTimeout(() => {
-      const content = modal.querySelector('.bg-white');
-      if (content) {
-        content.classList.remove('scale-95', 'opacity-0');
+    document.body.appendChild(loadingMessage);
+
+    try {
+      console.log('📧 Iniciando envío de factura por email...');
+      console.log('📋 Datos de la factura:', {
+        id: invoiceData.id,
+        customer: invoiceData.customerEmail,
+        total: invoiceData.total,
+        items: invoiceData.items.length
+      });
+
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentMethod: 'email_only',
+          items: invoiceData.items,
+          customerEmail: invoiceData.customerEmail,
+          total: invoiceData.subtotal,
+        }),
+      });
+
+      console.log('📡 Respuesta del servidor:', response.status);
+
+      const data = await response.json();
+      console.log('📊 Datos recibidos:', data);
+
+      // Remover mensaje de carga
+      document.body.removeChild(loadingMessage);
+
+      if (data.success && data.emailSent) {
+        // Mostrar mensaje de éxito con estilo
+        // Usar React state en lugar de DOM dinámico
+        setShowInvoice(true);
+      } else {
+        // Mostrar mensaje de factura generada exitosamente
+        // Usar React state en lugar de DOM dinámico
+        setShowInvoice(true);
       }
-    }, 100);
-    
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
+    } catch (error) {
+      console.error('❌ Error enviando factura:', error);
+      
+      // Remover mensaje de carga
+      if (document.body.contains(loadingMessage)) {
+        document.body.removeChild(loadingMessage);
       }
-    });
+
+      // Mostrar mensaje de error
+      const errorMessage = document.createElement('div');
+      errorMessage.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+          <div style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+            <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+            <h3 style="margin: 0 0 15px; font-size: 24px;">Error de Conexión</h3>
+            <p style="margin: 0 0 20px; font-size: 16px;">No se pudo enviar la factura. Por favor, intenta nuevamente.</p>
+            <button class="close-modal-btn" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">Cerrar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorMessage);
+      
+      // Agregar event listener para el botón cerrar
+      setTimeout(() => {
+        const closeBtn = errorMessage.querySelector('.close-modal-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            document.body.removeChild(errorMessage);
+          });
+        }
+      }, 100);
+    }
   };
+
+  const handleCompletePurchase = () => {
+    // Limpiar carrito después del pago
+    clearCart();
+    setShowInvoice(false);
+    setInvoiceData(null);
+    setSelectedPaymentMethod('');
+    setCustomerEmail('');
+    alert('¡Compra completada exitosamente!');
+  };
+
+  const handleViewProduct = (product: Product) => {
+    setShowProductDetail(product);
+    setSelectedQuantity(1);
+  };
+
+  const handleToggleFavorite = (product: Product) => {
+    setFavorites(prev => 
+      prev.includes(product.id) 
+        ? prev.filter(id => id !== product.id)
+        : [...prev, product.id]
+    );
+  };
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0) return { status: "Agotado", color: "destructive", icon: AlertTriangle };
-    if (stock < 10) return { status: "Stock Bajo", color: "destructive", icon: AlertTriangle };
-    if (stock < 50) return { status: "Stock Medio", color: "warning", icon: AlertTriangle };
-    return { status: "Disponible", color: "default", icon: CheckCircle };
+    if (stock === 0) return { text: 'Agotado', color: 'destructive' };
+    if (stock < 5) return { text: `Solo ${stock}`, color: 'destructive' };
+    if (stock < 10) return { text: `Stock Bajo (${stock})`, color: 'secondary' };
+    return { text: `${stock} disponibles`, color: 'default' };
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "Analgésicos": return Pill;
-      case "Vitaminas": return Sparkles;
-      case "Cardiovasculares": return Heart;
-      case "Respiratorios": return TrendingUp;
-      case "Gastrointestinales": return Shield;
-      case "Antihistamínicos": return Zap;
-      case "Endocrinológicos": return TrendingUp;
-      default: return Zap;
-    }
-  };
-
-  const getTotalCart = () => {
-    if (!cartItems || !Array.isArray(cartItems)) return 0;
-    return (cartItems as CartItem[]).reduce((total, item) => total + (item.precio * item.cantidad), 0);
-  };
-
-  const getCartItemCount = () => {
-    if (!cartItems || !Array.isArray(cartItems)) return 0;
-    return (cartItems as CartItem[]).reduce((total, item) => total + item.cantidad, 0);
-  };
-
-  const handleImageLoad = (productId: string) => {
-    setImageLoading(prev => ({ ...prev, [productId]: false }));
-    
-    // Optimizar rendimiento: remover imagen del DOM si no es visible
-    const imgElement = document.querySelector(`img[data-product-id="${productId}"]`);
-    if (imgElement) {
-      imgElement.setAttribute('data-loaded', 'true');
-    }
-  };
-
-  const handleImageError = (productId: string) => {
-    setImageLoading(prev => ({ ...prev, [productId]: false }));
-    // Log del error para debugging
-    console.warn(`Error loading image for product ${productId}`);
-    
-    // Marcar la imagen como fallida para mostrar el icono por defecto
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      product.imagen_url = undefined;
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Cargando tienda virtual</h2>
+          <p className="text-gray-600">Preparando los mejores productos farmacéuticos para ti...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header Elegante */}
-      <div className="bg-white shadow-lg border-b relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-        <div className="max-w-7xl mx-auto px-4 py-8 relative">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Catálogo de Productos
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header Moderno */}
+      <div className="bg-white/90 backdrop-blur-md shadow-xl border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                🏥 Qualipharm Store
               </h1>
-              <p className="text-gray-600 mt-2 text-lg">
-                Descubre nuestra amplia gama de productos farmacéuticos de calidad
+              <p className="text-gray-600 mt-1">
+                Tu farmacia virtual de confianza - {stats.totalProducts} productos disponibles
               </p>
-              <div className="flex items-center justify-center lg:justify-start space-x-4 mt-4">
-                <div className="flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full">
-                  <ShoppingCart className="h-5 w-5 text-blue-600" />
-                  <span className="text-blue-600 font-semibold">{getCartItemCount()} productos</span>
-                </div>
-                <div className="flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-full">
-                  <span className="text-green-600 font-semibold">Total: ${getTotalCart().toFixed(2)}</span>
-                </div>
-                {getCartItemCount() > 0 && (
-                  <Button
-                    onClick={() => window.location.href = '/checkout'}
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Ir al Carrito
-                  </Button>
-                )}
-              </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="shadow-md"
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="shadow-md"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filtros Avanzados */}
-      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Búsqueda Inteligente */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                🔍 Buscar Productos
-              </label>
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-              <Input
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200"
-              />
-              </div>
-            </div>
-
-            {/* Filtro de Categoría */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                📂 Categoría
-              </label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Seleccionar categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            </div>
-
-            {/* Filtro de Marca */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                🏷️ Marca
-              </label>
-            <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-              <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Seleccionar marca" />
-              </SelectTrigger>
-              <SelectContent>
-                {brands.map((brand) => (
-                  <SelectItem key={brand} value={brand}>
-                    {brand}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            </div>
-
-            {/* Ordenamiento */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                🔄 Ordenar Por
-              </label>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="border-gray-200 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Seleccionar orden" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="relevance">🎯 Más Relevantes</SelectItem>
-                <SelectItem value="price_low">💰 Precio: Menor a Mayor</SelectItem>
-                <SelectItem value="price_high">💰 Precio: Mayor a Menor</SelectItem>
-                <SelectItem value="rating">⭐ Mejor Valorados</SelectItem>
-                <SelectItem value="stock">📦 Más Stock</SelectItem>
-                <SelectItem value="name">🔤 Nombre A-Z</SelectItem>
-              </SelectContent>
-            </Select>
-            </div>
-          </div>
-
-          {/* Filtros Avanzados */}
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                🔧 Filtros Avanzados
-              </h3>
-            </div>
-            
-            <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    📱 Escanear Código
-                  </label>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setShowScanner(true)}
-                className="border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-              >
-                <Barcode className="h-4 w-4 mr-2" />
-                Escanear Código
-              </Button>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    📷 Búsqueda por Imagen
-                  </label>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-              >
-                <Camera className="h-4 w-4 mr-2" />
-                Búsqueda por Imagen
-              </Button>
-                </div>
-            </div>
-            
-            <div className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-full">
-              🎯 {filteredProducts.length} productos encontrados
+              <div className="text-right">
+                <p className="text-sm text-gray-600">Total en carrito</p>
+                <p className="text-2xl font-bold text-blue-600">${cartTotal.toFixed(2)}</p>
+                <p className="text-xs text-gray-500">{cartCount} productos</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grid de Productos */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="h-12 w-12 text-blue-500" />
+      {/* Layout Principal: Catálogo y Carrito Lado a Lado */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Catálogo de Productos - 2/3 del ancho */}
+          <div className="lg:col-span-2">
+            {/* Filtros y Búsqueda */}
+            <Card className="mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-5 w-5 text-blue-600" />
+                  Filtros y Búsqueda
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Buscar productos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                  
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                  <SelectValue placeholder="Categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+                  <Select value={`${sortBy}-${sortOrder}`} onValueChange={(value) => {
+                    const [field, order] = value.split('-');
+                    setSortBy(field as SortOption);
+                    setSortOrder(order as SortOrder);
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nombre-asc">Nombre A-Z</SelectItem>
+                      <SelectItem value="nombre-desc">Nombre Z-A</SelectItem>
+                      <SelectItem value="precio-asc">Precio Menor a Mayor</SelectItem>
+                      <SelectItem value="precio-desc">Precio Mayor a Menor</SelectItem>
+                      <SelectItem value="stock_disponible-desc">Mayor Stock</SelectItem>
+                      <SelectItem value="rating-desc">Mejor Calificación</SelectItem>
+                    </SelectContent>
+                  </Select>
+              </div>
+
+                <div className="flex items-center justify-between">
+                  <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "grid" | "list")}>
+                    <TabsList>
+                      <TabsTrigger value="grid">
+                        <Grid className="h-4 w-4 mr-2" />
+                        Cuadrícula
+                      </TabsTrigger>
+                      <TabsTrigger value="list">
+                        <List className="h-4 w-4 mr-2" />
+                        Lista
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+
+                  <p className="text-sm text-gray-600">
+                    {filteredProducts.length} productos encontrados
+                  </p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No se encontraron productos</h3>
-            <p className="text-gray-600 text-lg">Intenta ajustar los filtros o términos de búsqueda</p>
-          </div>
-        ) : (
-          <div className={`grid gap-8 ${
-            viewMode === "grid" 
-              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
-              : "grid-cols-1"
-          }`}>
-            {filteredProducts.map((product) => {
-              const stockStatus = getStockStatus(product.stock_disponible);
-              const CategoryIcon = getCategoryIcon(product.categoria);
-              const cartItem = cartItems && Array.isArray(cartItems) ? (cartItems as CartItem[]).find(item => item.id === product.id) : undefined;
-              
-              return (
-                <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-xl bg-white overflow-hidden transform hover:-translate-y-2">
-                  {/* Imagen del Producto con Overlay */}
-                  <div className="relative aspect-square bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 overflow-hidden">
-                    {product.imagen_url ? (
-                      <>
-                        {/* Estado de carga optimizado */}
-                        {imageLoading[product.id] !== false && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                            <div className="w-6 h-6 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-                          </div>
-                        )}
-                        
-                        <img 
-                          src={product.imagen_url} 
-                          alt={product.nombre}
-                          loading="lazy"
-                          decoding="async"
-                          data-product-id={product.id}
-                          className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${
-                            imageLoading[product.id] === false ? 'opacity-100' : 'opacity-0'
-                          }`}
-                          onLoad={() => handleImageLoad(product.id)}
-                          onError={() => handleImageError(product.id)}
-                          style={{
-                            willChange: 'transform',
-                            backfaceVisibility: 'hidden'
-                          }}
-                          onLoadStart={() => {
-                            // Timeout de 8 segundos para imágenes individuales
-                            setTimeout(() => {
-                              if (imageLoading[product.id] !== false) {
-                                handleImageError(product.id);
-                              }
-                            }, 8000);
-                          }}
-                        />
-                        
-                        {/* Overlay gradiente sutil */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                        <div className="text-center">
-                          <CategoryIcon className="h-16 w-16 text-blue-600 opacity-60 group-hover:opacity-80 transition-opacity duration-300 mx-auto mb-2" />
-                          <p className="text-xs text-gray-500 font-medium">Imagen no disponible</p>
-                        </div>
-                    </div>
-                    )}
-                    
-                    {/* Badge de Estado de Stock */}
-                    <div className="absolute top-3 right-3">
-                      <Badge variant={stockStatus.color as any} className="text-xs font-medium shadow-lg">
-                        <stockStatus.icon className="h-3 w-3 mr-1" />
-                        {stockStatus.status}
+          </CardContent>
+        </Card>
+
+            {/* Grid de Productos Premium */}
+            <div className={viewMode === 'grid' 
+              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" 
+              : "space-y-6"
+            }>
+              {filteredProducts.map((product, index) => (
+                <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 border-0 bg-white/95 backdrop-blur-sm overflow-hidden relative">
+                  {/* Badge de Destacado */}
+                  {index < 3 && (
+                    <div className="absolute top-4 left-4 z-10">
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Destacado
                       </Badge>
-                    </div>
-
-                    {/* Acciones Rápidas con Hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-6">
-                      <div className="flex space-x-3">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleQuickView(product)}
-                          className="bg-white/90 hover:bg-white shadow-lg transform hover:scale-110 transition-all duration-200"
+        </div>
+                  )}
+                  
+                  <CardContent className="p-6">
+                    <div className="flex flex-col h-full">
+                      {/* Imagen del producto */}
+                      <div className="relative mb-4">
+                        <div className="aspect-square bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 rounded-xl overflow-hidden shadow-inner">
+                    <img
+                      src={product.imagen_url}
+                      alt={product.nombre}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                        
+                        <Badge 
+                          className={`absolute top-2 right-2 shadow-lg ${
+                            getStockStatus(product.stock_disponible).color === 'destructive' 
+                              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' 
+                              : getStockStatus(product.stock_disponible).color === 'secondary'
+                              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white'
+                              : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                          }`}
                         >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleAddToCart(product)}
-                          disabled={product.stock_disponible === 0}
-                          className="bg-blue-600 hover:bg-blue-700 shadow-lg transform hover:scale-110 transition-all duration-200"
+                          {getStockStatus(product.stock_disponible).text}
+                      </Badge>
+                        
+                    <Button
+                      size="sm"
+                          variant="ghost"
+                          className="absolute top-2 left-2 h-8 w-8 p-0 bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
+                          onClick={() => handleToggleFavorite(product)}
                         >
-                          <ShoppingCart className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Indicador de Cantidad en Carrito */}
-                    {cartItem && (
-                      <div className="absolute top-3 left-3">
-                        <Badge className="bg-blue-600 text-white shadow-lg">
-                          {cartItem.cantidad} en carrito
-                        </Badge>
-                      </div>
-                    )}
+                          <Heart 
+                            className={`h-4 w-4 transition-all duration-300 ${
+                              favorites.includes(product.id) 
+                                ? 'fill-red-500 text-red-500 scale-110' 
+                                : 'text-gray-400 hover:text-red-400'
+                            }`} 
+                          />
+                    </Button>
+                        
+                        {/* Efecto de brillo */}
+                        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+                        </div>
                   </div>
 
-                  <CardContent className="p-6">
-                    {/* Información del Producto */}
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <h3 className="font-bold text-gray-900 text-lg line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
+                      {/* Información del producto */}
+                      <div className="flex-1 flex flex-col">
+                        <h3 className="font-bold text-xl text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.nombre}
                         </h3>
-                        <Badge variant="outline" className="text-xs font-medium border-blue-200 text-blue-700">
-                          {product.marca}
+                        
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                          {product.descripcion}
+                        </p>
+                        
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
+                            {product.marca}
+                          </Badge>
+                          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                            {product.categoria}
                         </Badge>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-                        {product.descripcion}
-                      </p>
-                      
-                      {/* Rating y Reviews */}
-                      <div className="flex items-center space-x-2">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-semibold ml-1 text-gray-900">{product.rating}</span>
-                          <span className="text-xs text-gray-500 ml-1">({product.reviews} reseñas)</span>
                         </div>
-                      </div>
-                    </div>
 
-                    {/* Precio y Acciones */}
-                    <div className="mt-6 flex items-center justify-between">
-                      <div className="space-y-1">
-                        <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                          ${product.precio.toFixed(2)}
-                        </span>
-                        <div className="text-sm text-gray-500">
-                          Stock: <span className="font-medium">{product.stock_disponible} unidades</span>
+                        {/* Rating Premium */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 transition-colors ${
+                                  i < Math.floor(product.rating)
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-600 font-medium">
+                            {product.rating} ({product.reviews} reseñas)
+                          </span>
+                        </div>
+
+                        {/* Precio y Stock Premium */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                              ${product.precio.toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-500">cada unidad</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-600">Disponible</p>
+                            <p className="text-lg font-bold text-green-600">{product.stock_disponible}</p>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        {cartItem ? (
-                          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateQuantity(product.id, cartItem.cantidad - 1)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="font-semibold text-blue-600 min-w-[20px] text-center">
-                              {cartItem.cantidad}
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleAddToCart(product)}
-                              disabled={product.stock_disponible === 0}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
+
+                        {/* Botones de acción Premium */}
+                        <div className="flex gap-2 mt-auto">
                           <Button
+                            onClick={() => handleViewProduct(product)}
+                            variant="outline"
+                            className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
                             size="sm"
-                            onClick={() => handleAddToCart(product)}
-                            disabled={product.stock_disponible === 0}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
                           >
-                            <ShoppingCart className="h-4 w-4 mr-2" />
-                            Agregar
+                            <Eye className="h-4 w-4 mr-1" />
+                            Ver
                           </Button>
-                        )}
+                          <Button
+                            onClick={() => addToCart(product, 1)}
+                            disabled={product.stock_disponible === 0}
+                            className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 hover:from-blue-600 hover:via-purple-600 hover:to-indigo-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 group"
+                            size="sm"
+                          >
+                            <ShoppingCart className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform" />
+                          Agregar
+                        </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Carrito Flotante */}
-      {getCartItemCount() > 0 && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 max-w-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Tu Carrito</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.href = '/checkout'}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                Ver Todo
-              </Button>
-            </div>
-            
-            <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
-              {cartItems && Array.isArray(cartItems) && (cartItems as CartItem[]).slice(0, 3).map((item) => (
-                <div key={item.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                    <Pill className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{item.nombre}</p>
-                    <p className="text-xs text-gray-500">Cantidad: {item.cantidad}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-blue-600">${(item.precio * item.cantidad).toFixed(2)}</p>
-                  </div>
-                </div>
               ))}
-              {cartItems && Array.isArray(cartItems) && (cartItems as CartItem[]).length > 3 && (
-                <div className="text-center text-sm text-gray-500 py-2">
-                  +{(cartItems as CartItem[]).length - 3} productos más
+            </div>
+          </div>
+
+          {/* Carrito de Compras Premium - 1/3 del ancho */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-24 shadow-2xl border-0 bg-white/95 backdrop-blur-sm h-[600px] flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 text-white rounded-t-lg relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/90" />
+                <div className="relative z-10">
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="p-2 bg-white/20 rounded-lg">
+                      <ShoppingCart className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">Carrito Premium</div>
+                      <div className="text-sm text-blue-100">{cartCount} productos</div>
+                    </div>
+                  </CardTitle>
                 </div>
-              )}
-            </div>
-            
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-gray-900">Total:</span>
-                <span className="text-xl font-bold text-green-600">${getTotalCart().toFixed(2)}</span>
-              </div>
-              <Button
-                onClick={() => window.location.href = '/checkout'}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg"
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Proceder al Pago
-              </Button>
-            </div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
+              </CardHeader>
+              <CardContent className="p-6 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+                {cart.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="relative mb-6">
+                      <ShoppingCart className="h-20 w-20 text-gray-300 mx-auto" />
+                      <div className="absolute -top-2 -right-2">
+                        <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+                      </div>
+                    </div>
+                    <p className="text-gray-500 text-xl font-medium mb-2">Tu carrito está vacío</p>
+                    <p className="text-gray-400 text-sm">Agrega algunos productos premium para comenzar</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full">
+                    {/* Lista de productos en el carrito Premium */}
+                    <div className="space-y-3">
+                      {cart.map((item) => (
+                        <div key={item.product.id} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                            <span className="text-xl">💊</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-sm text-gray-900 truncate">{item.product.nombre}</h4>
+                            <p className="text-xs text-gray-600 font-medium">{item.product.marca}</p>
+                            <p className="text-sm font-bold text-blue-600">${item.product.precio.toFixed(2)} c/u</p>
+                            <p className="text-xs text-gray-500">Subtotal: ${item.subtotal.toFixed(2)}</p>
+                          </div>
+                          <div className="flex items-center space-x-1 flex-shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              className="h-6 w-6 p-0 border-blue-200 text-blue-600 hover:bg-blue-50"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-6 text-center text-xs font-bold text-gray-700">{item.quantity}</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              className="h-6 w-6 p-0 border-blue-200 text-blue-600 hover:bg-blue-50"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => removeFromCart(item.product.id)}
+                              className="h-6 w-6 p-0 bg-red-500 hover:bg-red-600 text-white shadow-sm"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Resumen del carrito Premium */}
+                    <div className="border-t border-gray-200 pt-6 space-y-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-gray-700">Subtotal:</span>
+                        <span className="text-blue-600">${cartTotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>IVA (15%):</span>
+                        <span>${(cartTotal * 0.15).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-xl font-bold border-t border-gray-300 pt-3">
+                        <span className="text-gray-800">Total:</span>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">${(cartTotal * 1.15).toFixed(2)}</span>
+                      </div>
+                      
+                      <Button 
+                        onClick={handleCheckout}
+                        className="w-full bg-gradient-to-r from-green-500 via-emerald-500 to-teal-600 hover:from-green-600 hover:via-emerald-600 hover:to-teal-700 text-white h-14 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                      >
+                        <CreditCard className="h-6 w-6 mr-2 group-hover:scale-110 transition-transform" />
+                        Proceder al Pago Premium
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        onClick={clearCart} 
+                        className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-300"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Vaciar Carrito
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
-             )}
-       
-       {/* Toast de notificación */}
-       {showToast && (
-         <NotificationToast
-           message={toastMessage}
-           type="success"
-           duration={3000}
-           onClose={() => setShowToast(false)}
-         />
-       )}
+      </div>
+
+      {/* Modal de Detalle del Producto */}
+      <Dialog open={!!showProductDetail} onOpenChange={() => setShowProductDetail(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-blue-600" />
+              {showProductDetail?.nombre}
+            </DialogTitle>
+          </DialogHeader>
+          {showProductDetail && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg overflow-hidden">
+                <img
+                  src={showProductDetail.imagen_url}
+                  alt={showProductDetail.nombre}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{showProductDetail.nombre}</h3>
+                  <p className="text-gray-600 mb-4">{showProductDetail.descripcion}</p>
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-3xl font-bold text-blue-600">${showProductDetail.precio.toFixed(2)}</span>
+                    <Badge className={getStockStatus(showProductDetail.stock_disponible).color}>
+                      {getStockStatus(showProductDetail.stock_disponible).text}
+                          </Badge>
+                        </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <p><span className="font-medium">Marca:</span> {showProductDetail.marca}</p>
+                  <p><span className="font-medium">Categoría:</span> {showProductDetail.categoria}</p>
+                  <p><span className="font-medium">Stock disponible:</span> {showProductDetail.stock_disponible}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
+                    disabled={selectedQuantity <= 1}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="w-12 text-center font-medium">{selectedQuantity}</span>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedQuantity(Math.min(showProductDetail.stock_disponible, selectedQuantity + 1))}
+                    disabled={selectedQuantity >= showProductDetail.stock_disponible}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  onClick={() => {
+                    addToCart(showProductDetail, selectedQuantity);
+                    setShowProductDetail(null);
+                  }}
+                  disabled={showProductDetail.stock_disponible === 0}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Agregar al Carrito
+                </Button>
+                          </div>
+                        </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Pago */}
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-blue-600" />
+              {user ? 'Finalizar Compra' : 'Comprar como Invitado'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Email del Cliente {!user && <span className="text-orange-600">(Requerido para enviar la factura)</span>}
+              </label>
+              <Input
+                type="email"
+                placeholder={user ? user.email : "tu-email@ejemplo.com"}
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="w-full"
+                required
+              />
+              {!user && (
+                <p className="text-xs text-gray-500 mt-1">
+                  📧 Te enviaremos la factura a este email
+                </p>
+              )}
+            </div>
+
+            {/* Datos del Cliente */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Nombre Completo <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Tu nombre completo"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Teléfono <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="tel"
+                  placeholder="0999-999-999"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Datos de Envío */}
+            <div className="border-t pt-4">
+              <h4 className="text-lg font-semibold text-gray-800 mb-3">📦 Datos de Envío</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Dirección <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Calle principal, número, referencia"
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    className="w-full"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Ciudad <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Quito, Guayaquil, etc."
+                      value={shippingCity}
+                      onChange={(e) => setShippingCity(e.target.value)}
+                      className="w-full"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Notas de Envío
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Instrucciones adicionales (opcional)"
+                      value={shippingNotes}
+                      onChange={(e) => setShippingNotes(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Forma de Pago</label>
+              <div className="space-y-2">
+                <Button
+                  variant={selectedPaymentMethod === 'transferencia' ? 'default' : 'outline'}
+                  className="w-full justify-start"
+                  onClick={() => setSelectedPaymentMethod('transferencia')}
+                >
+                  <Banknote className="h-4 w-4 mr-2" />
+                  Transferencia Bancaria
+                </Button>
+                <Button
+                  variant={selectedPaymentMethod === 'tarjeta' ? 'default' : 'outline'}
+                  className="w-full justify-start"
+                  onClick={() => setSelectedPaymentMethod('tarjeta')}
+                >
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Tarjeta de Crédito/Débito
+                </Button>
+                <Button
+                  variant={selectedPaymentMethod === 'efectivo' ? 'default' : 'outline'}
+                  className="w-full justify-start"
+                  onClick={() => setSelectedPaymentMethod('efectivo')}
+                >
+                  <Banknote className="h-4 w-4 mr-2" />
+                  Efectivo (Contraentrega)
+                </Button>
+                <Button
+                  variant={selectedPaymentMethod === 'digital' ? 'default' : 'outline'}
+                  className="w-full justify-start"
+                  onClick={() => setSelectedPaymentMethod('digital')}
+                >
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Pago Digital (PayPal, etc.)
+                          </Button>
+                        </div>
+                      </div>
+
+            {/* Mensaje informativo para pago en efectivo */}
+            {selectedPaymentMethod === 'efectivo' && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+                <div className="flex items-start">
+                  <div className="text-lg mr-2">💵</div>
+                  <div>
+                    <strong>Pago Contraentrega:</strong> El pago se realizará al momento de recibir el producto. 
+                    Asegúrate de tener el monto exacto disponible.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {paymentError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
+                {paymentError}
+          </div>
+        )}
+
+            <div className="flex gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setPaymentError('');
+                }}
+                className="flex-1"
+                disabled={paymentLoading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handlePayment}
+                disabled={paymentLoading}
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+              >
+                {paymentLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Procesando...
+          </div>
+                ) : (
+                  'Confirmar Pago'
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Venta */}
+      <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              Venta Generada
+            </DialogTitle>
+          </DialogHeader>
+          {invoiceData && (
+            <div className="space-y-6">
+              {/* Header de la factura */}
+              <div className="text-center border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-900">QUALIPHARM LABORATORIO FARMACÉUTICO</h2>
+                <p className="text-gray-600">Sistema de Gestión Farmacéutica LogicQP</p>
+                <p className="text-sm text-gray-500">Venta #{invoiceData.id}</p>
+                <p className="text-sm text-gray-500">
+                  Fecha: {invoiceData.date} - Hora: {invoiceData.time}
+                </p>
+              </div>
+
+              {/* Información del cliente */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Cliente:</h3>
+                  <p className="text-gray-600">{invoiceData.customerEmail}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Forma de Pago:</h3>
+                  <p className="text-gray-600 capitalize">{invoiceData.paymentMethod}</p>
+                </div>
+              </div>
+
+              {/* Detalle de productos */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Detalle de Productos:</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="border border-gray-300 px-4 py-2 text-left">Producto</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">Cantidad</th>
+                        <th className="border border-gray-300 px-4 py-2 text-right">Precio Unit.</th>
+                        <th className="border border-gray-300 px-4 py-2 text-right">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {invoiceData.items.map((item: any, index: number) => (
+                        <tr key={index}>
+                          <td className="border border-gray-300 px-4 py-2">
+                            <div>
+                              <p className="font-medium">{item.product.nombre}</p>
+                              <p className="text-sm text-gray-500">{item.product.marca}</p>
+                            </div>
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{item.quantity}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-right">${item.product.precio.toFixed(2)}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-right">${item.subtotal.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Totales */}
+              <div className="border-t pt-4">
+                <div className="flex justify-end">
+                  <div className="w-64 space-y-2">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span>${invoiceData.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>IVA (15%):</span>
+                      <span>${invoiceData.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                      <span>Total:</span>
+                      <span>${invoiceData.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  onClick={handlePrintInvoice}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Imprimir Venta
+                </Button>
+                <Button
+                  onClick={handleEmailInvoice}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Enviar por Email
+                </Button>
+                <Button
+                  onClick={handleCompletePurchase}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Finalizar Compra
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowInvoice(false);
+                    setInvoiceData(null);
+                    setCart([]);
+                    setShowPaymentModal(false);
+                    setPaymentError('');
+                    setCustomerEmail('');
+                    setCustomerName('');
+                    setCustomerPhone('');
+                    setShippingAddress('');
+                    setShippingCity('');
+                    setShippingNotes('');
+                    setSelectedPaymentMethod('');
+                  }}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cerrar
+                </Button>
+      </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

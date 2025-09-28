@@ -46,7 +46,7 @@ const chartTypeIcons = {
   doughnut: PieChart,
 }
 
-export function ChartContainer({
+function ChartContainer({
   title,
   subtitle,
   children,
@@ -260,3 +260,6 @@ export function AreaChartContainer(props: Omit<ChartContainerProps, "chartType">
 export function DoughnutChartContainer(props: Omit<ChartContainerProps, "chartType">) {
   return <ChartContainer {...props} chartType="doughnut" />
 }
+
+// Exportación por defecto para compatibilidad con lazy loading
+export default ChartContainer

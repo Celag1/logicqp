@@ -13,3 +13,6 @@ declare module 'quagga' {
 }
 
 
+
+
+

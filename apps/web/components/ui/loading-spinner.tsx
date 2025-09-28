@@ -1,97 +1,39 @@
-"use client"
-
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react";
 
 interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg" | "xl"
-  className?: string
-  text?: string
-  showText?: boolean
-  variant?: "default" | "primary" | "secondary" | "muted"
+  size?: "sm" | "md" | "lg";
+  text?: string;
+  className?: string;
 }
 
-const sizeClasses = {
-  sm: "h-4 w-4",
-  md: "h-6 w-6",
-  lg: "h-8 w-8",
-  xl: "h-12 w-12",
-}
-
-const variantClasses = {
-  default: "text-foreground",
-  primary: "text-primary",
-  secondary: "text-secondary-foreground",
-  muted: "text-muted-foreground",
-}
-
-export function LoadingSpinner({
-  size = "md",
-  className,
-  text,
-  showText = false,
-  variant = "default",
+export function LoadingSpinner({ 
+  size = "md", 
+  text = "Cargando...", 
+  className = "" 
 }: LoadingSpinnerProps) {
+  const sizeClasses = {
+    sm: "h-4 w-4",
+    md: "h-8 w-8", 
+    lg: "h-12 w-12"
+  };
+
   return (
-    <div className={cn("flex flex-col items-center justify-center space-y-2", className)}>
-      <Loader2
-        className={cn(
-          "animate-spin",
-          sizeClasses[size],
-          variantClasses[variant]
-        )}
-        aria-label="Cargando"
-      />
-      {showText && text && (
-        <p className={cn("text-sm", variantClasses[variant])}>
-          {text}
-        </p>
+    <div className={`flex flex-col items-center justify-center space-y-2 ${className}`}>
+      <Loader2 className={`animate-spin ${sizeClasses[size]} text-blue-600`} />
+      {text && (
+        <p className="text-sm text-gray-600 animate-pulse">{text}</p>
       )}
     </div>
-  )
+  );
 }
 
-// Variantes predefinidas para casos comunes
-export function LoadingSpinnerInline({
-  size = "sm",
-  className,
-  variant = "muted",
-}: Omit<LoadingSpinnerProps, "text" | "showText">) {
+export function PageLoadingSpinner({ text = "Cargando datos reales..." }: { text?: string }) {
   return (
-    <Loader2
-      className={cn(
-        "animate-spin inline",
-        sizeClasses[size],
-        variantClasses[variant],
-        className
-      )}
-      aria-label="Cargando"
-    />
-  )
-}
-
-export function LoadingSpinnerPage({
-  text = "Cargando...",
-  className,
-}: Pick<LoadingSpinnerProps, "text" | "className">) {
-  return (
-    <div className={cn("flex items-center justify-center min-h-[400px]", className)}>
-      <LoadingSpinner size="xl" text={text} showText />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600 text-lg">{text}</p>
+      </div>
     </div>
-  )
-}
-
-export function LoadingSpinnerOverlay({
-  text = "Cargando...",
-  className,
-}: Pick<LoadingSpinnerProps, "text" | "className">) {
-  return (
-    <div className={cn(
-      "fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center",
-      className
-    )}>
-      <LoadingSpinner size="xl" text={text} showText />
-    </div>
-  )
+  );
 }

@@ -18,7 +18,7 @@ async function createUsers() {
     {
       email: 'celag3@gmail.com',
       password: 'Cel@g123',
-      user_metadata: { nombre: 'Celso Aguirre' },
+      user_metadata: { nombre: 'Grupo 6 - Cel@g' },
       role: 'super_admin'
     },
     {

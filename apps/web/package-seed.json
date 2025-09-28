@@ -1,0 +1,13 @@
+{
+  "name": "logicqp-seed",
+  "version": "1.0.0",
+  "description": "Script para insertar datos de prueba en la base de datos",
+  "main": "seed-database.js",
+  "scripts": {
+    "seed": "node seed-database.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "dotenv": "^16.3.1"
+  }
+}

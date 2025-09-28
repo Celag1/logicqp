@@ -2,25 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ShoppingBag, Truck, CreditCard, Sparkles } from 'lucide-react';
+import { CheckCircle, ShoppingBag, Truck, CreditCard, Sparkles, Mail, Phone, Loader2 } from 'lucide-react';
 import { playSuccessSound, playConfettiSound, triggerHapticFeedback } from '@/components/sound-effects';
 
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onGoToDashboard?: () => void;
   orderNumber: string;
   total: number;
   itemCount: number;
+  notificationStatus?: {
+    email: boolean;
+    sms: boolean;
+    sending: boolean;
+  };
 }
 
-export default function SuccessModal({ isOpen, onClose, orderNumber, total, itemCount }: SuccessModalProps) {
+export default function SuccessModal({ isOpen, onClose, onGoToDashboard, orderNumber, total, itemCount, notificationStatus }: SuccessModalProps) {
   const [showConfetti, setShowConfetti] = useState(false);
-  const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
     if (isOpen) {
+      console.log('SuccessModal: Modal abierto, mostrando confeti');
       setShowConfetti(true);
-      setCountdown(10);
       
       // Efectos de sonido y vibración
       playSuccessSound();
@@ -28,35 +33,33 @@ export default function SuccessModal({ isOpen, onClose, orderNumber, total, item
       triggerHapticFeedback();
       
       // Ocultar confeti después de 3 segundos
-      const confettiTimer = setTimeout(() => setShowConfetti(false), 3000);
-      
-      // Countdown para redirección automática
-      const countdownTimer = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(countdownTimer);
-            window.location.href = '/dashboard';
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      const confettiTimer = setTimeout(() => {
+        console.log('SuccessModal: Ocultando confeti');
+        setShowConfetti(false);
+      }, 3000);
 
       return () => {
+        console.log('SuccessModal: Limpiando timer de confeti');
         clearTimeout(confettiTimer);
-        clearInterval(countdownTimer);
       };
+    } else {
+      console.log('SuccessModal: Modal cerrado');
     }
   }, [isOpen]);
+
+  // Debug: Monitorear cambios en las props
+  useEffect(() => {
+    console.log('SuccessModal: Props actualizadas', { isOpen, orderNumber, total, itemCount });
+  }, [isOpen, orderNumber, total, itemCount]);
 
   if (!isOpen) return null;
 
   return (
     <>
       {/* Overlay con efecto de desenfoque */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         {/* Modal principal */}
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-100 opacity-100">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] transform transition-all duration-500 scale-100 opacity-100 flex flex-col">
           {/* Header con gradiente */}
           <div className="relative overflow-hidden rounded-t-3xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 p-8 text-center text-white">
             {/* Confeti animado */}
@@ -88,7 +91,7 @@ export default function SuccessModal({ isOpen, onClose, orderNumber, total, item
           </div>
 
           {/* Contenido del modal */}
-          <div className="p-8">
+          <div className="p-8 flex-1 overflow-y-auto">
             {/* Número de orden */}
             <div className="text-center mb-6">
               <div className="bg-gray-50 rounded-xl p-4 mb-4">
@@ -127,10 +130,48 @@ export default function SuccessModal({ isOpen, onClose, orderNumber, total, item
               </p>
             </div>
 
-            {/* Botones de acción */}
+            {/* Estado de notificaciones */}
+            {notificationStatus && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">📬 Notificaciones enviadas:</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm text-gray-600">Email de confirmación</span>
+                    </div>
+                    {notificationStatus.sending ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                    ) : notificationStatus.email ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <span className="text-xs text-red-600">Error</span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Phone className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-gray-600">SMS de confirmación</span>
+                    </div>
+                    {notificationStatus.sending ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-green-600" />
+                    ) : notificationStatus.sms ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <span className="text-xs text-red-600">Error</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* Botones de acción - Fijos en la parte inferior */}
+          <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-3xl">
             <div className="space-y-3">
               <Button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={onGoToDashboard || (() => window.location.href = '/dashboard')}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -144,13 +185,6 @@ export default function SuccessModal({ isOpen, onClose, orderNumber, total, item
               >
                 Continuar Comprando
               </Button>
-            </div>
-
-            {/* Countdown para redirección automática */}
-            <div className="text-center mt-4">
-              <p className="text-xs text-gray-500">
-                Redirigiendo automáticamente en {countdown} segundos...
-              </p>
             </div>
           </div>
         </div>
