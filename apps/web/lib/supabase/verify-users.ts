@@ -27,7 +27,7 @@ export async function verifyUsersInDatabase() {
     }
 
     console.log('\nUsuarios en auth.users:')
-    users?.forEach(user => {
+    users?.forEach((user: any) => {
       console.log(`- ${user.email} - Confirmado: ${user.email_confirmed_at ? 'Sí' : 'No'}`)
     })
 
