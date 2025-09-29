@@ -19,7 +19,7 @@ export function useAuth() {
     console.log('🔐 useAuth: Inicializando...')
     
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }: any) => {
       if (!isMounted) return;
       
       if (error) {
