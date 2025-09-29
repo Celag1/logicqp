@@ -215,7 +215,7 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
           </div>
 
           {/* User Info */}
-          {isAuthenticated && (
+          {(isAuthenticated || profile || user) && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
@@ -242,6 +242,35 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
                     {getRoleDisplayName(currentUserRole)}
                   </span>
                 </div>
+              </div>
+              {/* Debug info */}
+              <div className="mt-2 text-xs text-gray-500">
+                <p>Email: {profile?.email || user?.email || 'No disponible'}</p>
+                <p>Rol detectado: {currentUserRole}</p>
+                <p>Perfil cargado: {profile ? 'Sí' : 'No'}</p>
+              </div>
+              
+              {/* Logout Button */}
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  {isLoggingOut ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
+                      Cerrando...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar Sesión
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           )}
