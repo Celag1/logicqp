@@ -73,7 +73,7 @@ interface InventoryItem {
 
 // Mock data - En producción esto vendría de Supabase
 // Importar Supabase para obtener datos reales
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 
 export default function InventarioPage() {
   const { user } = useAuth();

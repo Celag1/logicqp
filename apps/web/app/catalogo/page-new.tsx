@@ -96,7 +96,7 @@ export default function CatalogoPage() {
 
       console.log('📡 Ejecutando consulta a Supabase...');
       // Usar la configuración centralizada de Supabase
-      const { supabase: supabasePublic } = await import('@/lib/supabase');
+      const { supabase: supabasePublic } = await import('@/lib/supabase/client');
       
       const queryPromise = supabasePublic
         .from('productos')

@@ -60,7 +60,7 @@ interface OrderItem {
 }
 
 // Importar Supabase para obtener datos reales
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 
 export default function OrdenesPage() {
   const [orders, setOrders] = useState<Order[]>([]);
