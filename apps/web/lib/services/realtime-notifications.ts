@@ -48,7 +48,7 @@ export class RealtimeNotificationService {
           table: 'notificaciones',
           filter: `usuario_id=eq.${userId}`
         },
-        (payload) => {
+        (payload: any) => {
           console.log('🔔 Nueva notificación recibida:', payload);
           
           const notification: RealtimeNotification = {
