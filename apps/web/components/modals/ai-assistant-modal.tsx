@@ -252,7 +252,7 @@ export default function AIAssistantModal({ isOpen, onClose }: AIAssistantModalPr
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -297,22 +297,36 @@ export default function AIAssistantModal({ isOpen, onClose }: AIAssistantModalPr
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => copyToClipboard(message.content)}
-                                  className="h-6 w-6 p-0"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    copyToClipboard(message.content);
+                                  }}
+                                  className="h-6 w-6 p-0 hover:bg-gray-200"
                                 >
                                   <Copy className="h-3 w-3" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-6 w-6 p-0 text-green-600 hover:text-green-700"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('👍 Me gusta');
+                                  }}
+                                  className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
                                 >
                                   <ThumbsUp className="h-3 w-3" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('👎 No me gusta');
+                                  }}
+                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                 >
                                   <ThumbsDown className="h-3 w-3" />
                                 </Button>

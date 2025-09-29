@@ -87,7 +87,11 @@ export default function SidebarMenuFixed({ userRole = "cliente", isAuthenticated
   console.log('  currentUserRole inicial:', currentUserRole);
   console.log('  isAuthenticated:', isAuthenticated);
   
-  // Forzar super admin para admin@logicqp.com
+  // Forzar super admin para usuarios específicos
+  if (profile?.email === 'celag3@gmail.com' || user?.email === 'celag3@gmail.com') {
+    currentUserRole = 'super_admin';
+    console.log('🔧 Forzando rol super_admin para celag3@gmail.com');
+  }
   if (profile?.email === 'admin@logicqp.com' || user?.email === 'admin@logicqp.com') {
     currentUserRole = 'super_admin';
     console.log('🔧 Forzando rol super_admin para admin@logicqp.com');

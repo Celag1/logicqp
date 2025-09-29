@@ -186,9 +186,17 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
   
   // Obtener información real del usuario desde useAuth
   const currentUser = user;
-  const currentUserRole = profile?.rol || user?.role || "cliente";
+  let currentUserRole = profile?.rol || user?.role || "cliente";
   const currentIsAuthenticated = !!user;
   const currentUserName = profile?.nombre || user?.email?.split('@')[0] || 'Usuario';
+  
+  // Forzar super admin para usuarios específicos
+  if (profile?.email === 'celag3@gmail.com' || user?.email === 'celag3@gmail.com') {
+    currentUserRole = 'super_admin';
+  }
+  if (profile?.email === 'admin@logicqp.com' || user?.email === 'admin@logicqp.com') {
+    currentUserRole = 'super_admin';
+  }
   
   // Debug logs solo en desarrollo y con throttling
   useEffect(() => {
