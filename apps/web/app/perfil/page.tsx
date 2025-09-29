@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 import { postgrestClient } from "@/lib/supabase/postgrest-client";
 import { 
   User, 
@@ -113,10 +113,7 @@ export default function PerfilPage() {
       );
 
       // Crear cliente de Supabase con service role key para evitar problemas de JWT
-      const supabaseAdmin = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-      );
+      const supabaseAdmin = supabase;
 
       const queryPromise = supabaseAdmin
         .from('profiles')
@@ -230,10 +227,7 @@ export default function PerfilPage() {
       console.log('📊 Datos a actualizar en Supabase:', updateData);
 
       // Crear cliente de Supabase con service role key
-      const supabaseAdmin = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-      );
+      const supabaseAdmin = supabase;
 
       // Actualizar directamente en Supabase local
       const { error: supabaseError } = await supabaseAdmin
@@ -335,10 +329,7 @@ export default function PerfilPage() {
       }
 
       // Crear cliente de Supabase con service role key
-      const supabaseAdmin = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-      );
+      const supabaseAdmin = supabase;
 
       // Actualizar en Supabase local
       console.log('📧 Actualizando verificación de email en Supabase...');
@@ -399,10 +390,7 @@ export default function PerfilPage() {
       }
 
       // Crear cliente de Supabase con service role key
-      const supabaseAdmin = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-      );
+      const supabaseAdmin = supabase;
 
       // Actualizar en Supabase local
       console.log('📱 Actualizando verificación de teléfono en Supabase...');

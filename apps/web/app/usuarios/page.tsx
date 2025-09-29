@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,11 +87,8 @@ export default function UsuariosPage() {
     try {
       setLoading(true);
 
-      // Crear cliente de Supabase con service role key para evitar problemas de JWT
-      const supabaseAdmin = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-      );
+      // Usar cliente de Supabase existente
+      const supabaseAdmin = supabase;
 
       // Agregar timeout para evitar bucles infinitos
       const timeoutPromise = new Promise((_, reject) =>
@@ -207,10 +204,7 @@ export default function UsuariosPage() {
         }
 
         // Crear cliente de Supabase con service role key
-        const supabaseAdmin = createClient(
-          'http://127.0.0.1:54321',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-        );
+        const supabaseAdmin = supabase;
 
         // Primero crear el usuario en la tabla de autenticación
         const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
@@ -317,10 +311,7 @@ export default function UsuariosPage() {
         }
 
         // Crear cliente de Supabase con service role key
-        const supabaseAdmin = createClient(
-          'http://127.0.0.1:54321',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-        );
+        const supabaseAdmin = supabase;
 
         const { error } = await supabaseAdmin
           .from('profiles')

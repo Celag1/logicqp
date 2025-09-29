@@ -23,7 +23,7 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/client';
 
 interface CompanyInfo {
   name: string;
@@ -74,10 +74,7 @@ export default function EmpresaPage() {
       // Primero intentar cargar desde Supabase
       try {
         // Crear cliente de Supabase con service role key para evitar problemas de JWT
-        const supabaseAdmin = createClient(
-          'http://127.0.0.1:54321',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-        );
+        const supabaseAdmin = supabase;
         
         const { data, error } = await supabaseAdmin
           .from('empresa_config')
@@ -193,10 +190,7 @@ export default function EmpresaPage() {
         console.log('🔍 Intentando guardar en Supabase...');
         
         // Crear cliente de Supabase con service role key para evitar problemas de JWT
-        const supabaseAdmin = createClient(
-          'http://127.0.0.1:54321',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
-        );
+        const supabaseAdmin = supabase;
         
         // Primero intentar UPDATE, si no existe hacer INSERT
         const { data: existingData, error: selectError } = await supabaseAdmin
