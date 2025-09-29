@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 // Importar Supabase para obtener datos reales
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 // Importar jsPDF dinámicamente para evitar problemas de SSR
