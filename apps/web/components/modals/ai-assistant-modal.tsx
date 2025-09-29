@@ -205,7 +205,7 @@ export default function AIAssistantModal({ isOpen, onClose }: AIAssistantModalPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl h-[80vh] flex flex-col">
+      <Card className="w-full max-w-4xl h-[90vh] flex flex-col">
         <CardHeader className="flex-shrink-0 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -252,8 +252,9 @@ export default function AIAssistantModal({ isOpen, onClose }: AIAssistantModalPr
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4 overflow-y-auto">
-            <div className="space-y-4">
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full p-4">
+              <div className="space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -339,9 +340,10 @@ export default function AIAssistantModal({ isOpen, onClose }: AIAssistantModalPr
                   </div>
                 </div>
               ))}
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
+                <div ref={messagesEndRef} />
+              </div>
+            </ScrollArea>
+          </div>
 
           {/* Suggested Questions */}
           {messages.length === 1 && (
