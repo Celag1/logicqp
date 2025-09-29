@@ -288,6 +288,8 @@ export default function CatalogoPage() {
 
   // Funciones del carrito
   const addToCart = (product: Product, quantity: number = 1) => {
+    console.log('🛒 Agregando al carrito:', product.nombre, 'cantidad:', quantity);
+    
     // Validar stock disponible
     if (product.stock_disponible <= 0) {
       alert('❌ Este producto no está disponible en stock');
@@ -314,6 +316,9 @@ export default function CatalogoPage() {
         return [...prev, { product, quantity, subtotal: quantity * product.precio }];
       }
     });
+
+    // Mostrar notificación de éxito
+    alert(`✅ ${product.nombre} agregado al carrito`);
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -827,7 +832,11 @@ export default function CatalogoPage() {
                             Ver
                           </Button>
                           <Button
-                            onClick={() => addToCart(product, 1)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addToCart(product, 1);
+                            }}
                             disabled={product.stock_disponible === 0}
                             className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 hover:from-blue-600 hover:via-purple-600 hover:to-indigo-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 group"
                             size="sm"
@@ -1017,7 +1026,9 @@ export default function CatalogoPage() {
                 
                 <Button
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     addToCart(showProductDetail, selectedQuantity);
                     setShowProductDetail(null);
                   }}

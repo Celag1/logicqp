@@ -239,10 +239,11 @@ export class ReportsService {
     try {
       console.log('📊 Generando reporte de clientes...');
 
-      // Obtener clientes
+      // Obtener clientes (usuarios con rol de cliente)
       const { data: clientes, error: clientesError } = await supabase
-        .from('clientes')
-        .select('id, nombre, created_at, activo');
+        .from('profiles')
+        .select('id, nombre, created_at, activo')
+        .eq('rol', 'cliente');
 
       if (clientesError) {
         console.error('❌ Error obteniendo clientes:', clientesError);
