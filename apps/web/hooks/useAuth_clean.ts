@@ -95,7 +95,7 @@ export function useAuth() {
     initAuth()
     
     // Escuchar cambios en la sesión de Supabase local
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       if (event === 'SIGNED_IN' && session?.user) {
         // Obtener perfil del usuario desde la base de datos local
         const { data: profile, error: profileError } = await supabase
