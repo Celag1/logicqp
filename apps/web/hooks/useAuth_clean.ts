@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { localDB } from '@/lib/local-database'
 import { localLogin, localLogout, getCurrentUser, saveSession, hasActiveSession, LocalUser } from '@/lib/auth/local-auth'
 
