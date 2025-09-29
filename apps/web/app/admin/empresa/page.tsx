@@ -23,7 +23,6 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { supabase } from '@/lib/supabase/client';
 
 interface CompanyInfo {
   name: string;
