@@ -178,16 +178,16 @@ export class ReportsService {
         return { error: productosError.message };
       }
 
-      // Obtener movimientos recientes
+      // Obtener movimientos recientes (usando lotes como inventario)
       const { data: movimientos, error: movimientosError } = await supabase
-        .from('inventario')
+        .from('lotes')
         .select(`
-          cantidad,
-          tipo_movimiento,
-          fecha_movimiento,
+          cantidad_disponible,
+          fecha_vencimiento,
+          activo,
           productos(nombre)
         `)
-        .order('fecha_movimiento', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (movimientosError) {
@@ -224,7 +224,7 @@ export class ReportsService {
       };
 
       // Guardar reporte
-      await this.saveReport('inventario', report, userId, {});
+      await this.saveReport('lotes', report, userId, {});
 
       console.log('✅ Reporte de inventario generado exitosamente');
       return { report };

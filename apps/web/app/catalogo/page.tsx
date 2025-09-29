@@ -210,7 +210,7 @@ export default function CatalogoPage() {
         stock_disponible: producto.lotes?.reduce((total: number, lote: any) => total + (lote.cantidad_disponible || 0), 0) || producto.stock || 0,
         rating: 4.5,
         reviews: 25,
-        imagen_url: producto.foto_url || `https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=400&fit=crop&crop=center&q=80&auto=format&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`
+        imagen_url: producto.imagen_url || `https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=400&fit=crop&crop=center&q=80&auto=format&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`
       })) || [];
 
       setProducts(realProducts);
