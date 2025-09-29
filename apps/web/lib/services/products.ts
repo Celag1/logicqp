@@ -172,13 +172,13 @@ class ProductService {
         throw error
       }
 
-      const activeProducts = data?.filter((p: Product) => p.activo) || []
+      const activeProducts = data?.filter((p: any) => p.activo) || []
       
       const stats: ProductStats = {
         total: activeProducts.length,
-        inStock: activeProducts.filter((p: Product) => p.stock_disponible > 0).length,
-        lowStock: activeProducts.filter((p: Product) => p.stock_disponible > 0 && p.stock_disponible < 10).length,
-        outOfStock: activeProducts.filter((p: Product) => p.stock_disponible === 0).length,
+        inStock: activeProducts.filter((p: any) => p.stock_disponible > 0).length,
+        lowStock: activeProducts.filter((p: any) => p.stock_disponible > 0 && p.stock_disponible < 10).length,
+        outOfStock: activeProducts.filter((p: any) => p.stock_disponible === 0).length,
         categories: this.groupBy(activeProducts, 'categoria'),
         brands: this.groupBy(activeProducts, 'marca')
       }
@@ -205,7 +205,7 @@ class ProductService {
         throw error
       }
 
-      const categories = Array.from(new Set(data?.map((p: Product) => p.categoria) || [])) as string[]
+      const categories = Array.from(new Set(data?.map((p: any) => p.categoria) || [])) as string[]
       console.log('✅ Categorías obtenidas:', categories)
       return categories
     } catch (error) {
@@ -228,7 +228,7 @@ class ProductService {
         throw error
       }
 
-      const brands = Array.from(new Set(data?.map((p: Product) => p.marca) || [])) as string[]
+      const brands = Array.from(new Set(data?.map((p: any) => p.marca) || [])) as string[]
       console.log('✅ Marcas obtenidas:', brands)
       return brands
     } catch (error) {

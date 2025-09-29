@@ -140,13 +140,13 @@ export default function NuevosProductosPage() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'price' | 'rating' | 'name'>('newest');
 
-  const categories = Array.from(new Set(products.map(p => p.category)));
+  const categories = Array.from(new Set(products.map((p: any) => p.category)));
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                          product.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
     
@@ -247,7 +247,7 @@ export default function NuevosProductosPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Esta Semana</p>
-                  <p className="text-2xl font-bold text-blue-600">{products.filter(p => getDaysSinceAdded(p.addedDate) <= 7).length}</p>
+                  <p className="text-2xl font-bold text-blue-600">{products.filter((p: any) => getDaysSinceAdded(p.addedDate) <= 7).length}</p>
                 </div>
                 <Clock className="h-8 w-8 text-blue-600" />
               </div>
@@ -259,7 +259,7 @@ export default function NuevosProductosPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Precio Promedio</p>
-                  <p className="text-2xl font-bold text-purple-600">${Math.round(products.reduce((sum, p) => sum + p.price, 0) / products.length)}</p>
+                  <p className="text-2xl font-bold text-purple-600">${Math.round(products.reduce((sum: number, p: any) => sum + p.price, 0) / products.length)}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-purple-600" />
               </div>
@@ -271,7 +271,7 @@ export default function NuevosProductosPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Rating Promedio</p>
-                  <p className="text-2xl font-bold text-orange-600">{Math.ceil((products.reduce((sum, p) => sum + p.rating, 0) / products.length) * 100) / 100}</p>
+                  <p className="text-2xl font-bold text-orange-600">{Math.ceil((products.reduce((sum: number, p: any) => sum + p.rating, 0) / products.length) * 100) / 100}</p>
                 </div>
                 <Package className="h-8 w-8 text-orange-600" />
               </div>
@@ -300,7 +300,7 @@ export default function NuevosProductosPage() {
                   title="Filtrar por categoría"
                 >
                   <option value="all">Todas las categorías</option>
-                  {categories.map(category => (
+                  {categories.map((category: string) => (
                     <option key={category} value={category}>{category}</option>
                   ))}
                 </select>
@@ -358,7 +358,7 @@ export default function NuevosProductosPage() {
         {/* Products Grid/List */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => {
+            {filteredProducts.map((product: any) => {
               const stockStatus = getStockStatus(product.stock);
               const daysSinceAdded = getDaysSinceAdded(product.addedDate);
               
@@ -452,7 +452,7 @@ export default function NuevosProductosPage() {
                     </div>
                     
                     <div className="mt-3 flex flex-wrap gap-1">
-                      {product.tags.map((tag, index) => (
+                      {product.tags.map((tag: string, index: number) => (
                         <Badge key={index} variant="secondary" className="text-xs">
                           {tag}
                         </Badge>
@@ -465,7 +465,7 @@ export default function NuevosProductosPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredProducts.map((product) => {
+            {filteredProducts.map((product: any) => {
               const stockStatus = getStockStatus(product.stock);
               const daysSinceAdded = getDaysSinceAdded(product.addedDate);
               

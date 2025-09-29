@@ -131,7 +131,7 @@ export class ReportsService {
 
       // Calcular estadísticas
       const totalVentas = ventas?.length || 0;
-      const totalIngresos = ventas?.reduce((sum, venta) => sum + venta.total, 0) || 0;
+      const totalIngresos = ventas?.reduce((sum: number, venta: any) => sum + venta.total, 0) || 0;
       const promedioVenta = totalVentas > 0 ? totalIngresos / totalVentas : 0;
 
       // Agrupar por día
@@ -202,13 +202,13 @@ export class ReportsService {
 
       // Calcular estadísticas
       const totalProductos = productos?.length || 0;
-      const productosConStock = productos?.filter(p => p.stock > 0).length || 0;
-      const productosSinStock = productos?.filter(p => p.stock === 0).length || 0;
-      const productosStockBajo = productos?.filter(p => p.stock <= p.stock_minimo).length || 0;
-      const valorTotalInventario = productos?.reduce((sum, p) => sum + (p.stock * p.precio), 0) || 0;
+      const productosConStock = productos?.filter((p: any) => p.stock > 0).length || 0;
+      const productosSinStock = productos?.filter((p: any) => p.stock === 0).length || 0;
+      const productosStockBajo = productos?.filter((p: any) => p.stock <= p.stock_minimo).length || 0;
+      const valorTotalInventario = productos?.reduce((sum: number, p: any) => sum + (p.stock * p.precio), 0) || 0;
 
       // Procesar movimientos
-      const movimientosRecientes = movimientos?.map(m => ({
+      const movimientosRecientes = movimientos?.map((m: any) => ({
         producto: m.productos?.nombre || 'N/A',
         tipo: m.tipo_movimiento,
         cantidad: m.cantidad,
@@ -272,8 +272,8 @@ export class ReportsService {
 
       // Calcular estadísticas
       const totalClientes = clientes?.length || 0;
-      const clientesActivos = clientes?.filter(c => c.activo).length || 0;
-      const clientesNuevos = clientes?.filter(c => {
+      const clientesActivos = clientes?.filter((c: any) => c.activo).length || 0;
+      const clientesNuevos = clientes?.filter((c: any) => {
         const fechaRegistro = new Date(c.created_at);
         const hace30Dias = new Date();
         hace30Dias.setDate(hace30Dias.getDate() - 30);
@@ -350,7 +350,7 @@ export class ReportsService {
 
       // Calcular estadísticas
       const totalProductos = productos?.length || 0;
-      const productosActivos = productos?.filter(p => p.activo).length || 0;
+      const productosActivos = productos?.filter((p: any) => p.activo).length || 0;
       const productosInactivos = totalProductos - productosActivos;
 
       // Productos por categoría
@@ -413,7 +413,7 @@ export class ReportsService {
 
   // Métodos auxiliares
   private groupSalesByDay(ventas: any[]): Array<{ fecha: string; ventas: number; ingresos: number }> {
-    const grouped = ventas.reduce((acc, venta) => {
+    const grouped = ventas.reduce((acc: any, venta: any) => {
       const fecha = new Date(venta.fecha).toLocaleDateString('es-EC');
       if (!acc[fecha]) {
         acc[fecha] = { ventas: 0, ingresos: 0 };
@@ -431,7 +431,7 @@ export class ReportsService {
   }
 
   private groupSalesByMonth(ventas: any[]): Array<{ mes: string; ventas: number; ingresos: number }> {
-    const grouped = ventas.reduce((acc, venta) => {
+    const grouped = ventas.reduce((acc: any, venta: any) => {
       const mes = new Date(venta.fecha).toLocaleDateString('es-EC', { year: 'numeric', month: 'long' });
       if (!acc[mes]) {
         acc[mes] = { ventas: 0, ingresos: 0 };
@@ -449,7 +449,7 @@ export class ReportsService {
   }
 
   private getTopProducts(ventas: any[]): Array<{ producto: string; cantidad: number; ingresos: number }> {
-    const productSales = ventas.reduce((acc, venta) => {
+    const productSales = ventas.reduce((acc: any, venta: any) => {
       venta.venta_items?.forEach((item: any) => {
         const producto = item.productos?.nombre || 'N/A';
         if (!acc[producto]) {
@@ -471,14 +471,19 @@ export class ReportsService {
       .slice(0, 10);
   }
 
-  private getTopClients(ventas: any[]): Array<{ cliente: string; ventas: number; ingresos: number }> {
-    const clientSales = ventas.reduce((acc, venta) => {
+  private getTopClients(ventas: any[]): Array<{ cliente: string; ventas: number; ingresos: number; ultimaCompra: string }> {
+    const clientSales = ventas.reduce((acc: any, venta: any) => {
       const cliente = venta.clientes?.nombre || 'N/A';
       if (!acc[cliente]) {
-        acc[cliente] = { ventas: 0, ingresos: 0 };
+        acc[cliente] = { ventas: 0, ingresos: 0, ultimaCompra: venta.created_at || venta.fecha_venta || new Date().toISOString() };
       }
       acc[cliente].ventas += 1;
       acc[cliente].ingresos += venta.total;
+      // Actualizar última compra si es más reciente
+      const ventaDate = venta.created_at || venta.fecha_venta;
+      if (ventaDate && new Date(ventaDate) > new Date(acc[cliente].ultimaCompra)) {
+        acc[cliente].ultimaCompra = ventaDate;
+      }
       return acc;
     }, {});
 
@@ -486,14 +491,15 @@ export class ReportsService {
       .map(([cliente, data]: [string, any]) => ({
         cliente,
         ventas: data.ventas,
-        ingresos: data.ingresos
+        ingresos: data.ingresos,
+        ultimaCompra: data.ultimaCompra
       }))
       .sort((a, b) => b.ingresos - a.ingresos)
       .slice(0, 10);
   }
 
   private getMostMovedProducts(movimientos: any[]): Array<{ producto: string; movimientos: number; entradas: number; salidas: number }> {
-    const productMovements = movimientos.reduce((acc, mov) => {
+    const productMovements = movimientos.reduce((acc: any, mov: any) => {
       const producto = mov.productos?.nombre || 'N/A';
       if (!acc[producto]) {
         acc[producto] = { movimientos: 0, entradas: 0, salidas: 0 };
@@ -519,11 +525,11 @@ export class ReportsService {
   }
 
   private getClientsWithoutPurchases(clientes: any[], ventas: any[]): Array<{ cliente: string; fechaRegistro: string; diasSinComprar: number }> {
-    const clientesConVentas = new Set(ventas.map(v => v.cliente_id));
+    const clientesConVentas = new Set(ventas.map((v: any) => v.cliente_id));
     
     return clientes
-      .filter(c => !clientesConVentas.has(c.id))
-      .map(c => {
+      .filter((c: any) => !clientesConVentas.has(c.id))
+      .map((c: any) => {
         const fechaRegistro = new Date(c.created_at);
         const ahora = new Date();
         const diasSinComprar = Math.floor((ahora.getTime() - fechaRegistro.getTime()) / (1000 * 60 * 60 * 24));
@@ -539,31 +545,31 @@ export class ReportsService {
   }
 
   private groupProductsByCategory(productos: any[]): Array<{ categoria: string; cantidad: number }> {
-    const grouped = productos.reduce((acc, producto) => {
+    const grouped = productos.reduce((acc: any, producto: any) => {
       const categoria = producto.categorias?.nombre || 'Sin categoría';
       acc[categoria] = (acc[categoria] || 0) + 1;
       return acc;
     }, {});
 
     return Object.entries(grouped)
-      .map(([categoria, cantidad]) => ({ categoria, cantidad: cantidad as number }))
+      .map(([categoria, cantidad]: [string, any]) => ({ categoria, cantidad: cantidad as number }))
       .sort((a, b) => b.cantidad - a.cantidad);
   }
 
   private groupProductsBySupplier(productos: any[]): Array<{ proveedor: string; cantidad: number }> {
-    const grouped = productos.reduce((acc, producto) => {
+    const grouped = productos.reduce((acc: any, producto: any) => {
       const proveedor = producto.proveedores?.nombre || 'Sin proveedor';
       acc[proveedor] = (acc[proveedor] || 0) + 1;
       return acc;
     }, {});
 
     return Object.entries(grouped)
-      .map(([proveedor, cantidad]) => ({ proveedor, cantidad: cantidad as number }))
+      .map(([proveedor, cantidad]: [string, any]) => ({ proveedor, cantidad: cantidad as number }))
       .sort((a, b) => b.cantidad - a.cantidad);
   }
 
   private getMostSoldProducts(ventas: any[]): Array<{ producto: string; ventas: number; ingresos: number; stock: number }> {
-    const productSales = ventas.reduce((acc, venta) => {
+    const productSales = ventas.reduce((acc: any, venta: any) => {
       const producto = venta.productos?.nombre || 'N/A';
       if (!acc[producto]) {
         acc[producto] = { ventas: 0, ingresos: 0, stock: 0 };
@@ -585,7 +591,7 @@ export class ReportsService {
   }
 
   private getLeastSoldProducts(ventas: any[]): Array<{ producto: string; ventas: number; ingresos: number; stock: number }> {
-    const productSales = ventas.reduce((acc, venta) => {
+    const productSales = ventas.reduce((acc: any, venta: any) => {
       const producto = venta.productos?.nombre || 'N/A';
       if (!acc[producto]) {
         acc[producto] = { ventas: 0, ingresos: 0, stock: 0 };

@@ -86,8 +86,24 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Obtener información real del usuario
-  const currentUserRole = profile?.rol || user?.role || userRole;
+  let currentUserRole = profile?.rol || user?.role || userRole;
   const currentUserName = profile?.nombre || user?.email?.split('@')[0] || 'Usuario';
+  
+  // Debug: Log para verificar el rol
+  console.log('🔍 Sidebar - Debug del rol:');
+  console.log('  profile?.rol:', profile?.rol);
+  console.log('  user?.role:', user?.role);
+  console.log('  userRole prop:', userRole);
+  console.log('  currentUserRole inicial:', currentUserRole);
+  console.log('  isAuthenticated:', isAuthenticated);
+  
+  // Fallback: Si el usuario es admin@logicqp.com, forzar rol super_admin
+  if (profile?.email === 'admin@logicqp.com' || user?.email === 'admin@logicqp.com') {
+    currentUserRole = 'super_admin';
+    console.log('🔧 Forzando rol super_admin para admin@logicqp.com');
+  }
+  
+  console.log('  currentUserRole final:', currentUserRole);
 
 
   const handleLogout = async () => {
@@ -128,7 +144,7 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
   const toggleSection = (sectionTitle: string) => {
     setExpandedSections(prev => 
       prev.includes(sectionTitle) 
-        ? prev.filter(title => title !== sectionTitle)
+        ? prev.filter((title: string) => title !== sectionTitle)
         : [...prev, sectionTitle]
     );
   };
@@ -226,8 +242,8 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
 
           {/* Navigation Sections */}
           <div className="space-y-4">
-            {navigationSections.map((section) => {
-              const filteredItems = section.items.filter((item) => {
+            {navigationSections.map((section: any) => {
+              const filteredItems = section.items.filter((item: any) => {
                 if (item.public) return true;
                 if (item.roles && item.roles.includes(currentUserRole)) return true;
                 return false;

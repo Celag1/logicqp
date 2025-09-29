@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
+import { config } from '@/lib/config';
 
-// Configuración de Supabase local real
-const supabaseUrl = 'http://127.0.0.1:54321';
-const supabaseAnonKey = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
+// Configuración de Supabase en la nube
+const supabaseUrl = config.supabase.url;
+const supabaseAnonKey = config.supabase.anonKey;
 
 // Crear cliente de Supabase con configuraciones optimizadas
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

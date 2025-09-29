@@ -204,7 +204,7 @@ export default function EmpresaPage() {
           .select('id')
           .limit(1);
         
-        let { error: upsertError } = { error: null };
+        let upsertError: any = null;
         
         if (existingData && existingData.length > 0) {
           // Actualizar registro existente

@@ -24,11 +24,14 @@ import {
 } from "lucide-react";
 import PaymentMethodSelector from "./payment-method-selector";
 import PaymentProcessor from "./payment-processor";
-import { 
-  paymentGatewayService, 
-  PaymentRequest, 
-  PaymentResponse 
-} from "@/lib/services/payment-gateway";
+import { simpleRealPaymentService, PaymentResult } from '@/lib/simple-real-payment';
+
+interface PaymentResponse {
+  success: boolean;
+  paymentId?: string;
+  message: string;
+  error?: string;
+}
 
 interface CartItem {
   id: string;
@@ -73,7 +76,7 @@ export default function CheckoutModal({
   });
 
   // Calcular totales
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 100 ? 0 : 10; // Envío gratis sobre $100
   const tax = subtotal * 0.15; // IVA 15%
   const total = subtotal + shipping + tax;
@@ -107,36 +110,44 @@ export default function CheckoutModal({
     setCurrentStep('processing');
 
     try {
-      const paymentRequest: PaymentRequest = {
-        amount: total,
-        currency: 'USD',
-        orderId,
-        customerId: customerData.email,
+      const paymentData = {
+        items: cartItems.map(item => ({
+          product: {
+            id: item.id,
+            nombre: item.name,
+            precio: item.price
+          },
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity
+        })),
         customerEmail: customerData.email,
         customerName: customerData.name,
-        description: `Orden ${orderId} - ${cartItems.length} productos`,
-        returnUrl: `${window.location.origin}/checkout/success?order=${orderId}`,
-        cancelUrl: `${window.location.origin}/checkout/cancel`,
-        metadata: {
-          items: cartItems.length,
-          customerPhone: customerData.phone,
-          customerAddress: customerData.address,
-          notes: customerData.notes
-        }
+        customerPhone: customerData.phone,
+        customerAddress: customerData.address,
+        total: total,
+        currency: 'USD',
+        notes: customerData.notes
       };
 
-      // Simular procesamiento (en producción esto se haría en el componente PaymentProcessor)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('💳 Procesando pago en LogicQP (La Mejor Tienda Virtual del Mundo)...', paymentData);
       
-      const response = await paymentGatewayService.processPayment(selectedPaymentMethod, paymentRequest);
+      const response = await simpleRealPaymentService.processPayment(paymentData);
       setPaymentResponse(response);
 
       if (response.success) {
+        console.log('✅ Pago exitoso en LogicQP:', response.paymentId);
         onOrderComplete(orderId);
+      } else {
+        console.log('❌ Pago falló:', response.message);
       }
 
-    } catch (error) {
-      console.error('Error procesando pago:', error);
+    } catch (error: any) {
+      console.error('❌ Error procesando pago:', error);
+      setPaymentResponse({
+        success: false,
+        message: error.message || 'Error de conexión. Intenta nuevamente.',
+        error: 'PAYMENT_ERROR'
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -151,7 +162,9 @@ export default function CheckoutModal({
 
   const getTotalWithFees = () => {
     if (!selectedPaymentMethod) return total;
-    return paymentGatewayService.getTotalWithFees(total, selectedPaymentMethod);
+    // Simular comisiones de pago (2% para tarjeta de crédito, 0% para efectivo)
+    const feeRate = selectedPaymentMethod === 'credit_card' ? 0.02 : 0;
+    return total + (total * feeRate);
   };
 
   if (!isOpen) return null;
@@ -263,7 +276,7 @@ export default function CheckoutModal({
                     <h3 className="text-lg font-semibold">Resumen del Pedido</h3>
                     
                     <div className="space-y-3">
-                      {cartItems.map((item) => (
+                      {cartItems.map((item: any) => (
                         <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg">
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                             <Package className="h-6 w-6 text-gray-600" />
@@ -356,7 +369,7 @@ export default function CheckoutModal({
                       {selectedPaymentMethod && (
                         <div className="flex justify-between text-sm text-gray-500">
                           <span>Comisión:</span>
-                          <span>{formatCurrency(paymentGatewayService.calculateFees(total, selectedPaymentMethod))}</span>
+                          <span>{formatCurrency(total * (selectedPaymentMethod === 'credit_card' ? 0.02 : 0))}</span>
                         </div>
                       )}
                       <div className="border-t pt-3 flex justify-between font-semibold text-lg">
@@ -402,30 +415,11 @@ export default function CheckoutModal({
             <TabsContent value="processing" className="flex-1 flex flex-col">
               <div className="flex-1 flex items-center justify-center p-6">
                 {selectedPaymentMethod && (
-                  <PaymentProcessor
-                    paymentRequest={{
-                      amount: total,
-                      currency: 'USD',
-                      orderId,
-                      customerId: customerData.email,
-                      customerEmail: customerData.email,
-                      customerName: customerData.name,
-                      description: `Orden ${orderId}`,
-                      returnUrl: `${window.location.origin}/checkout/success?order=${orderId}`,
-                      cancelUrl: `${window.location.origin}/checkout/cancel`
-                    }}
-                    paymentMethodId={selectedPaymentMethod}
-                    onPaymentComplete={(response) => {
-                      setPaymentResponse(response);
-                      if (response.success) {
-                        onOrderComplete(orderId);
-                      }
-                    }}
-                    onPaymentError={(error) => {
-                      console.error('Error en pago:', error);
-                    }}
-                    onCancel={() => setCurrentStep('payment')}
-                  />
+                  <div className="text-center space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-600">Procesando pago con tecnología de vanguardia...</p>
+                    <p className="text-sm text-gray-500">LogicQP - La Mejor Tienda Virtual del Mundo</p>
+                  </div>
                 )}
               </div>
             </TabsContent>

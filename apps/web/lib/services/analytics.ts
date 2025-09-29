@@ -141,8 +141,8 @@ class AnalyticsService {
         .gte('fecha_venta', this.getPreviousPeriodStart(filter).toISOString())
         .lt('fecha_venta', filter.dateRange.start.toISOString());
 
-      const currentTotal = currentData?.reduce((sum, item) => sum + (item.total || 0), 0) || 0;
-      const previousTotal = previousData?.reduce((sum, item) => sum + (item.total || 0), 0) || 0;
+      const currentTotal = currentData?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
+      const previousTotal = previousData?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
       const currentCount = currentData?.length || 0;
       const previousCount = previousData?.length || 0;
 
@@ -189,8 +189,8 @@ class AnalyticsService {
         .eq('activo', true);
 
       const totalProducts = products?.length || 0;
-      const lowStockProducts = products?.filter(p => p.stock_disponible <= p.stock_minimo).length || 0;
-      const totalValue = products?.reduce((sum, p) => sum + (p.stock_disponible * p.precio_venta), 0) || 0;
+      const lowStockProducts = products?.filter((p: any) => p.stock_disponible <= p.stock_minimo).length || 0;
+      const totalValue = products?.reduce((sum: number, p: any) => sum + (p.stock_disponible * p.precio_venta), 0) || 0;
 
       return [
         {
@@ -255,7 +255,7 @@ class AnalyticsService {
 
       const currentCount = users?.length || 0;
       const previousCount = previousUsers?.length || 0;
-      const activeUsers = users?.filter(u => u.rol !== 'inactivo').length || 0;
+      const activeUsers = users?.filter((u: any) => u.rol !== 'inactivo').length || 0;
 
       return [
         {
@@ -300,7 +300,7 @@ class AnalyticsService {
         .gte('fecha_venta', filter.dateRange.start.toISOString())
         .lte('fecha_venta', filter.dateRange.end.toISOString());
 
-      const totalRevenue = sales?.reduce((sum, item) => sum + (item.total || 0), 0) || 0;
+      const totalRevenue = sales?.reduce((sum: number, item: any) => sum + (item.total || 0), 0) || 0;
       const avgOrderValue = sales?.length ? totalRevenue / sales.length : 0;
 
       return [
@@ -379,10 +379,10 @@ class AnalyticsService {
       const groupedData = this.groupDataByPeriod(data || [], filter.granularity);
       
       return {
-        labels: groupedData.map(item => item.label),
+        labels: groupedData.map((item: any) => item.label),
         datasets: [{
           label: 'Ventas',
-          data: groupedData.map(item => item.value),
+          data: groupedData.map((item: any) => item.value),
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           borderColor: 'rgba(59, 130, 246, 1)',
           fill: true
@@ -411,20 +411,8 @@ class AnalyticsService {
         datasets: [{
           label: 'Stock por Categoría',
           data: Object.values(categoryData),
-          backgroundColor: [
-            'rgba(239, 68, 68, 0.1)',
-            'rgba(245, 158, 11, 0.1)',
-            'rgba(34, 197, 94, 0.1)',
-            'rgba(59, 130, 246, 0.1)',
-            'rgba(147, 51, 234, 0.1)'
-          ],
-          borderColor: [
-            'rgba(239, 68, 68, 1)',
-            'rgba(245, 158, 11, 1)',
-            'rgba(34, 197, 94, 1)',
-            'rgba(59, 130, 246, 1)',
-            'rgba(147, 51, 234, 1)'
-          ]
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: 'rgba(59, 130, 246, 1)'
         }]
       };
     } catch (error) {
@@ -448,10 +436,10 @@ class AnalyticsService {
       const groupedData = this.groupDataByPeriod(data || [], filter.granularity);
       
       return {
-        labels: groupedData.map(item => item.label),
+        labels: groupedData.map((item: any) => item.label),
         datasets: [{
           label: 'Nuevos Usuarios',
-          data: groupedData.map(item => item.value),
+          data: groupedData.map((item: any) => item.value),
           backgroundColor: 'rgba(34, 197, 94, 0.1)',
           borderColor: 'rgba(34, 197, 94, 1)',
           fill: true
@@ -478,10 +466,10 @@ class AnalyticsService {
       const groupedData = this.groupDataByPeriod(data || [], filter.granularity);
       
       return {
-        labels: groupedData.map(item => item.label),
+        labels: groupedData.map((item: any) => item.label),
         datasets: [{
           label: 'Ingresos',
-          data: groupedData.map(item => item.value),
+          data: groupedData.map((item: any) => item.value),
           backgroundColor: 'rgba(245, 158, 11, 0.1)',
           borderColor: 'rgba(245, 158, 11, 1)',
           fill: true
@@ -545,7 +533,7 @@ class AnalyticsService {
   private groupDataByPeriod(data: any[], granularity: string): TimeSeriesData[] {
     const groups: { [key: string]: number } = {};
     
-    data.forEach(item => {
+    data.forEach((item: any) => {
       const date = new Date(item.fecha_venta || item.created_at);
       let key: string;
       
@@ -571,7 +559,7 @@ class AnalyticsService {
       groups[key] = (groups[key] || 0) + (item.total || 1);
     });
     
-    return Object.entries(groups).map(([date, value]) => ({
+    return Object.entries(groups).map(([date, value]: [string, any]) => ({
       date,
       value,
       label: this.formatDateLabel(date, granularity)
@@ -581,7 +569,7 @@ class AnalyticsService {
   private groupByCategory(data: any[]): { [key: string]: number } {
     const groups: { [key: string]: number } = {};
     
-    data.forEach(item => {
+    data.forEach((item: any) => {
       const category = item.categoria || 'Sin categoría';
       groups[category] = (groups[category] || 0) + (item.stock_disponible || 0);
     });

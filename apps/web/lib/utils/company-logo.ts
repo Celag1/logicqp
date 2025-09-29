@@ -64,7 +64,7 @@ export async function getCompanyInfo(): Promise<CompanyInfo> {
         ...parsed
       };
       isLoadingCompanyInfo = false;
-      return companyInfoCache;
+      return companyInfoCache!;
     }
 
     // Si no hay datos locales, intentar cargar desde Supabase

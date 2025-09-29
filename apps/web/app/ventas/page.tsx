@@ -155,10 +155,10 @@ export default function VentasPage() {
       setFilteredSales(realSales);
 
       // Calcular métricas reales
-      const totalSales = realSales.reduce((sum, sale) => sum + sale.total, 0);
+      const totalSales = realSales.reduce((sum: number, sale: any) => sum + sale.total, 0);
       const totalOrders = realSales.length;
       const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
-      const completedOrders = realSales.filter(sale => sale.status === 'completed').length;
+      const completedOrders = realSales.filter((sale: any) => sale.status === 'completed').length;
       const conversionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 
       const realMetrics: SalesMetric[] = [
@@ -215,7 +215,7 @@ export default function VentasPage() {
     let filtered = sales;
 
     if (searchTerm) {
-      filtered = filtered.filter(sale =>
+      filtered = filtered.filter((sale: any) =>
         sale.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sale.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sale.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -223,7 +223,7 @@ export default function VentasPage() {
     }
 
     if (statusFilter !== "todos") {
-      filtered = filtered.filter(sale => sale.status === statusFilter);
+      filtered = filtered.filter((sale: any) => sale.status === statusFilter);
     }
 
     setFilteredSales(filtered);
@@ -326,7 +326,7 @@ export default function VentasPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {metrics.map((metric) => (
+          {metrics.map((metric: any) => (
             <Card key={metric.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50"></div>
               <CardContent className="p-6 relative">
@@ -386,7 +386,7 @@ export default function VentasPage() {
           <CardContent>
             <div className="space-y-4">
               {filteredSales.length > 0 ? (
-                filteredSales.map((sale) => (
+                filteredSales.map((sale: any) => (
                   <div key={sale.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <div className="flex items-center space-x-4">
                       {getStatusIcon(sale.status)}

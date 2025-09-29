@@ -384,7 +384,8 @@ export class UniversalExportService {
       const barWidth = (count / maxValue) * (chartWidth - 60);
       
       // Barra
-      this.doc.setFillColor(...colors[index % colors.length]);
+      const color = colors[index % colors.length];
+      this.doc.setFillColor(color[0], color[1], color[2]);
       this.doc.rect(chartX + 5, barY, barWidth, barHeight, 'F');
 
       // Etiqueta

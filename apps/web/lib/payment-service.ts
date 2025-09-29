@@ -22,7 +22,7 @@ class PaymentService {
 
   constructor() {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_...', {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-08-27.basil',
     });
   }
 
@@ -30,7 +30,7 @@ class PaymentService {
     try {
       // Crear productos en Stripe si no existen
       const lineItems = await Promise.all(
-        paymentData.items.map(async (item) => {
+        paymentData.items.map(async (item: any) => {
           // Buscar o crear producto en Stripe
           const product = await this.findOrCreateProduct(item.product);
           
@@ -55,7 +55,7 @@ class PaymentService {
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: Math.round(paymentData.total * 100), // Convertir a centavos
         currency: paymentData.currency || 'usd',
-        customer_email: paymentData.customerEmail,
+        receipt_email: paymentData.customerEmail,
         metadata: {
           invoice_id: `INV-${Date.now()}`,
           items_count: paymentData.items.length.toString(),

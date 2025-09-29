@@ -150,7 +150,7 @@ export default function UsuariosPage() {
     let filtered = users;
 
     if (searchTerm) {
-      filtered = filtered.filter(user =>
+      filtered = filtered.filter((user: any) =>
         user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -159,11 +159,11 @@ export default function UsuariosPage() {
     }
 
     if (roleFilter !== 'todos') {
-      filtered = filtered.filter(user => user.rol === roleFilter);
+      filtered = filtered.filter((user: any) => user.rol === roleFilter);
     }
 
     if (statusFilter !== 'todos') {
-      filtered = filtered.filter(user => user.status === statusFilter);
+      filtered = filtered.filter((user: any) => user.status === statusFilter);
     }
 
     setFilteredUsers(filtered);
@@ -531,7 +531,7 @@ export default function UsuariosPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user: any) => (
                 <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">

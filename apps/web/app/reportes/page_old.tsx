@@ -421,7 +421,7 @@ const fetchRealUsersData = async () => {
     
     if (error) throw error;
     
-    const profilesArray = (profiles as Profile[] || []).map(profile => ({
+    const profilesArray = (profiles as Profile[] || []).map((profile: any) => ({
       ...profile,
       status: 'active' // Asumir que todos los usuarios están activos
     }));
@@ -817,15 +817,15 @@ export default function ReportesPage() {
     let filtered = reports;
 
     if (selectedType !== "todos") {
-      filtered = filtered.filter(report => report.type === selectedType);
+      filtered = filtered.filter((report: any) => report.type === selectedType);
     }
 
     if (selectedCategory !== "todos") {
-      filtered = filtered.filter(report => report.category === selectedCategory);
+      filtered = filtered.filter((report: any) => report.category === selectedCategory);
     }
 
     if (selectedFormat !== "todos") {
-      filtered = filtered.filter(report => report.format === selectedFormat);
+      filtered = filtered.filter((report: any) => report.format === selectedFormat);
     }
 
     setFilteredReports(filtered);
@@ -872,7 +872,7 @@ export default function ReportesPage() {
     setLoading(true);
     // Simular generación de reporte
     setTimeout(() => {
-      setReports(reports.map(report => 
+      setReports(reports.map((report: any) => 
         report.id === reportId 
           ? { ...report, status: 'ready', lastGenerated: new Date().toISOString() }
           : report
@@ -921,19 +921,19 @@ export default function ReportesPage() {
       
       // Calcular estadísticas adicionales
       const totalReports = reportData.length;
-      const totalValue = reportData.reduce((sum, r) => sum + (r.value || 0), 0);
-      const avgChange = reportData.reduce((sum, r) => sum + (r.change || 0), 0) / totalReports;
-      const activeReports = reportData.filter(r => r.status === 'Activo').length;
-      const salesReports = reportData.filter(r => r.type === 'Ventas').length;
-      const inventoryReports = reportData.filter(r => r.type === 'Inventario').length;
-      const userReports = reportData.filter(r => r.type === 'Usuarios').length;
-      const financialReports = reportData.filter(r => r.type === 'Financiero').length;
+      const totalValue = reportData.reduce((sum: number, r: any) => sum + (r.value || 0), 0);
+      const avgChange = reportData.reduce((sum: number, r: any) => sum + (r.change || 0), 0) / totalReports;
+      const activeReports = reportData.filter((r: any) => r.status === 'Activo').length;
+      const salesReports = reportData.filter((r: any) => r.type === 'Ventas').length;
+      const inventoryReports = reportData.filter((r: any) => r.type === 'Inventario').length;
+      const userReports = reportData.filter((r: any) => r.type === 'Usuarios').length;
+      const financialReports = reportData.filter((r: any) => r.type === 'Financiero').length;
       
       // Top reportes por valor
       const topReports = [...reportData].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 5);
       
       // Análisis por tipo
-      const typeAnalysis = reportData.reduce((acc, report) => {
+      const typeAnalysis = reportData.reduce((acc: any, report: any) => {
         if (!acc[report.type]) {
           acc[report.type] = { count: 0, totalValue: 0, avgChange: 0 };
         }
@@ -943,7 +943,7 @@ export default function ReportesPage() {
         return acc;
       }, {} as Record<string, { count: number; totalValue: number; avgChange: number }>);
       
-      Object.keys(typeAnalysis).forEach(type => {
+      Object.keys(typeAnalysis).forEach((type: string) => {
         typeAnalysis[type].avgChange = typeAnalysis[type].avgChange / typeAnalysis[type].count;
       });
       
@@ -1021,7 +1021,7 @@ export default function ReportesPage() {
               </tr>
             </thead>
             <tbody>
-              ${Object.entries(typeAnalysis).map(([type, data], index) => `
+              ${Object.entries(typeAnalysis).map(([type, data]: [string, any], index: number) => `
                 <tr style="background: ${index % 2 === 0 ? '#f8fafc' : '#f1f5f9'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">${type}</td>
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #8b5cf6; text-align: center;">${data.count} reportes</td>
@@ -1871,7 +1871,7 @@ export default function ReportesPage() {
               </tr>
             </thead>
             <tbody>
-              ${Object.entries(usuariosPorRol).map(([rol, cantidad]) => {
+              ${Object.entries(usuariosPorRol).map(([rol, cantidad]: [string, any]) => {
                 const porcentaje = ((cantidad / totalUsuarios) * 100).toFixed(1);
                 const permisos = getRolePermissions(rol);
                 return `
@@ -2542,7 +2542,7 @@ export default function ReportesPage() {
     csvContent.push(['DISTRIBUCIÓN POR ROLES']);
     csvContent.push(['Rol', 'Cantidad', 'Porcentaje', 'Permisos Principales']);
     
-    Object.entries(usuariosPorRol).forEach(([rol, cantidad]) => {
+    Object.entries(usuariosPorRol).forEach(([rol, cantidad]: [string, any]) => {
       const porcentaje = ((cantidad / totalUsuarios) * 100).toFixed(1);
       const permisos = getRolePermissions(rol);
       csvContent.push([rol, cantidad.toString(), porcentaje + '%', permisos]);

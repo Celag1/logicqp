@@ -35,7 +35,7 @@ async function getEmailConfig(): Promise<EmailConfig> {
     }
 
     const config: any = {};
-    data.forEach(item => {
+    data.forEach((item: any) => {
       config[item.clave] = item.valor;
     });
 
@@ -67,7 +67,7 @@ async function getEmailConfig(): Promise<EmailConfig> {
 async function createTransporter() {
   const config = await getEmailConfig();
   
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: config.host,
     port: config.port,
     secure: config.secure,
@@ -191,7 +191,7 @@ export async function sendSaleNotificationEmail(
 
     const transporter = await createTransporter();
 
-    const productosHtml = saleData.productos.map(p => 
+    const productosHtml = saleData.productos.map((p: any) => 
       `<tr><td>${p.nombre}</td><td>${p.cantidad}</td><td>$${p.precio.toFixed(2)}</td><td>$${(p.cantidad * p.precio).toFixed(2)}</td></tr>`
     ).join('');
 
@@ -273,7 +273,7 @@ export async function sendSaleNotificationEmail(
         - Fecha: ${new Date(saleData.fecha).toLocaleDateString('es-EC')}
         
         Productos:
-        ${saleData.productos.map(p => `- ${p.nombre} x${p.cantidad} = $${(p.cantidad * p.precio).toFixed(2)}`).join('\n')}
+        ${saleData.productos.map((p: any) => `- ${p.nombre} x${p.cantidad} = $${(p.cantidad * p.precio).toFixed(2)}`).join('\n')}
         
         Total: $${saleData.total.toFixed(2)}
         

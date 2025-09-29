@@ -95,12 +95,8 @@ export default function CatalogoPage() {
       );
 
       console.log('📡 Ejecutando consulta a Supabase...');
-      // Crear un cliente de Supabase sin autenticación para la consulta de productos
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabasePublic = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
-      );
+      // Usar la configuración centralizada de Supabase
+      const { supabase: supabasePublic } = await import('@/lib/supabase');
       
       const queryPromise = supabasePublic
         .from('productos')
@@ -113,7 +109,9 @@ export default function CatalogoPage() {
             cantidad_disponible,
             fecha_vencimiento
           )
-        `);
+        `)
+        .eq('activo', true)
+        .order('nombre');
 
       const { data: productos, error: productosError } = await Promise.race([
         queryPromise,
@@ -158,7 +156,7 @@ export default function CatalogoPage() {
       setProducts(realProducts);
       setFilteredProducts(realProducts);
 
-      const uniqueCategories = ['Todas', ...Array.from(new Set(realProducts.map(p => p.categoria)))];
+      const uniqueCategories = ['Todas', ...Array.from(new Set(realProducts.map((p: any) => p.categoria)))];
       setCategories(uniqueCategories);
 
       console.log('✅ Productos cargados exitosamente:', realProducts.length);
@@ -185,7 +183,7 @@ export default function CatalogoPage() {
 
     // Filtro por búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(product =>
+      filtered = filtered.filter((product: any) =>
         product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.marca.toLowerCase().includes(searchTerm.toLowerCase())
@@ -194,17 +192,17 @@ export default function CatalogoPage() {
 
     // Filtro por categoría
     if (selectedCategory !== 'Todas') {
-      filtered = filtered.filter(product => product.categoria === selectedCategory);
+      filtered = filtered.filter((product: any) => product.categoria === selectedCategory);
     }
 
     // Filtro por rango de precio
-    filtered = filtered.filter(product => 
+    filtered = filtered.filter((product: any) => 
       product.precio >= priceRange[0] && product.precio <= priceRange[1]
     );
 
     // Filtro por marcas
     if (selectedBrands.length > 0) {
-      filtered = filtered.filter(product => selectedBrands.includes(product.marca));
+      filtered = filtered.filter((product: any) => selectedBrands.includes(product.marca));
     }
 
     // Ordenamiento
@@ -233,9 +231,9 @@ export default function CatalogoPage() {
   // Estadísticas
   const stats = useMemo(() => {
     const totalProducts = products.length;
-    const totalValue = products.reduce((sum, product) => sum + (product.precio * product.stock_disponible), 0);
-    const avgRating = products.reduce((sum, product) => sum + product.rating, 0) / totalProducts || 0;
-    const lowStock = products.filter(product => product.stock_disponible < 10).length;
+    const totalValue = products.reduce((sum: number, product: any) => sum + (product.precio * product.stock_disponible), 0);
+    const avgRating = products.reduce((sum: number, product: any) => sum + product.rating, 0) / totalProducts || 0;
+    const lowStock = products.filter((product: any) => product.stock_disponible < 10).length;
 
     return { totalProducts, totalValue, avgRating, lowStock };
   }, [products]);
@@ -245,7 +243,7 @@ export default function CatalogoPage() {
     setCart(prev => {
       const existingItem = prev.find(item => item.product.id === product.id);
       if (existingItem) {
-        return prev.map(item =>
+        return prev.map((item: any) =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity, subtotal: (item.quantity + quantity) * product.precio }
             : item
@@ -262,7 +260,7 @@ export default function CatalogoPage() {
       return;
     }
     setCart(prev =>
-      prev.map(item =>
+      prev.map((item: any) =>
         item.product.id === productId
           ? { ...item, quantity, subtotal: quantity * item.product.precio }
           : item
@@ -271,7 +269,7 @@ export default function CatalogoPage() {
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.product.id !== productId));
+    setCart(prev => prev.filter((item: any) => item.product.id !== productId));
   };
 
   const clearCart = () => {
@@ -341,13 +339,13 @@ export default function CatalogoPage() {
   const handleToggleFavorite = (product: Product) => {
     setFavorites(prev => 
       prev.includes(product.id) 
-        ? prev.filter(id => id !== product.id)
+        ? prev.filter((id: any) => id !== product.id)
         : [...prev, product.id]
     );
   };
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+  const cartCount = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
+  const cartTotal = cart.reduce((sum: number, item: any) => sum + item.subtotal, 0);
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { text: 'Agotado', color: 'destructive' };
@@ -423,7 +421,7 @@ export default function CatalogoPage() {
                       <SelectValue placeholder="Categoría" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories.map((category: string) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -476,7 +474,7 @@ export default function CatalogoPage() {
               ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
               : "space-y-4"
             }>
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product: any) => (
                 <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/90 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex flex-col h-full">
@@ -531,7 +529,7 @@ export default function CatalogoPage() {
                         {/* Rating */}
                         <div className="flex items-center gap-1 mb-3">
                           <div className="flex">
-                            {[...Array(5)].map((_, i) => (
+                            {[...Array(5)].map((_: any, i: number) => (
                               <Star
                                 key={i}
                                 className={`h-4 w-4 ${
@@ -608,7 +606,7 @@ export default function CatalogoPage() {
                   <div className="space-y-4">
                     {/* Lista de productos en el carrito */}
                     <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {cart.map((item) => (
+                      {cart.map((item: any) => (
                         <div key={item.product.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
                             <span className="text-lg">💊</span>

@@ -258,7 +258,7 @@ export const useTrendAnalysis = (metrics: AnalyticsMetric[]) => {
 
     // Calcular tendencias por categoría
     const categories: { [key: string]: number[] } = {};
-    metrics.forEach(metric => {
+    metrics.forEach((metric: any) => {
       if (!categories[metric.category]) {
         categories[metric.category] = [];
       }
@@ -266,16 +266,16 @@ export const useTrendAnalysis = (metrics: AnalyticsMetric[]) => {
     });
 
     const categoryTrends: { [key: string]: 'up' | 'down' | 'stable' } = {};
-    Object.entries(categories).forEach(([category, changes]) => {
-      const avgChange = changes.reduce((sum, change) => sum + change, 0) / changes.length;
+    Object.entries(categories).forEach(([category, changes]: [string, any]) => {
+      const avgChange = changes.reduce((sum: number, change: number) => sum + change, 0) / changes.length;
       if (avgChange > 5) categoryTrends[category] = 'up';
       else if (avgChange < -5) categoryTrends[category] = 'down';
       else categoryTrends[category] = 'stable';
     });
 
     // Calcular tendencia general
-    const allChanges = metrics.map(m => m.changePercentage);
-    const overallChange = allChanges.reduce((sum, change) => sum + change, 0) / allChanges.length;
+    const allChanges = metrics.map((m: any) => m.changePercentage);
+    const overallChange = allChanges.reduce((sum: number, change: number) => sum + change, 0) / allChanges.length;
     const overallTrend = overallChange > 2 ? 'up' : overallChange < -2 ? 'down' : 'stable';
 
     // Generar insights
@@ -289,7 +289,7 @@ export const useTrendAnalysis = (metrics: AnalyticsMetric[]) => {
       insights.push('📊 Las métricas se mantienen estables');
     }
 
-    Object.entries(categoryTrends).forEach(([category, trend]) => {
+    Object.entries(categoryTrends).forEach(([category, trend]: [string, any]) => {
       if (trend === 'up') {
         insights.push(`🚀 ${category} muestra crecimiento significativo`);
       } else if (trend === 'down') {
@@ -321,7 +321,7 @@ export const useAnalyticsAlerts = (metrics: AnalyticsMetric[]) => {
   useEffect(() => {
     const newAlerts: typeof alerts = [];
 
-    metrics.forEach(metric => {
+    metrics.forEach((metric: any) => {
       // Alertas por cambios significativos
       if (Math.abs(metric.changePercentage) > 20) {
         newAlerts.push({
@@ -364,7 +364,7 @@ export const useAnalyticsAlerts = (metrics: AnalyticsMetric[]) => {
   }, [metrics]);
 
   const dismissAlert = (alertId: string) => {
-    setAlerts(prev => prev.map(alert => 
+    setAlerts(prev => prev.map((alert: any) => 
       alert.id === alertId ? { ...alert, dismissed: true } : alert
     ));
   };
@@ -374,7 +374,7 @@ export const useAnalyticsAlerts = (metrics: AnalyticsMetric[]) => {
   };
 
   return {
-    alerts: alerts.filter(alert => !alert.dismissed),
+    alerts: alerts.filter((alert: any) => !alert.dismissed),
     dismissAlert,
     clearAllAlerts
   };

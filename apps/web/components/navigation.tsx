@@ -258,7 +258,7 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
   };
   
   // Filtrar menús basado en permisos
-  const filteredMenu = navigationMenu.filter(item => {
+  const filteredMenu = navigationMenu.filter((item: any) => {
     if (item.public) return true;
     if (item.roles && item.roles.includes(currentUserRole)) return true;
     return false;
@@ -291,7 +291,7 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
   // Función para filtrar submenús
   const getFilteredSubmenu = (submenu: any[]) => {
     if (!submenu) return [];
-    return submenu.filter(item => {
+    return submenu.filter((item: any) => {
       if (!item.roles) return true;
       return item.roles.includes(currentUserRole);
     });
@@ -333,7 +333,7 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
 
           {/* Menú Principal Horizontal - Mejorado con Dropdowns */}
           <div className="hidden lg:flex items-center space-x-1">
-            {filteredMenu.map((item) => {
+            {filteredMenu.map((item: any) => {
               const Icon = item.icon;
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               const filteredSubmenu = hasSubmenu ? getFilteredSubmenu(item.submenu) : [];
@@ -371,7 +371,7 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
                         <p className="text-xs text-gray-500">{item.description}</p>
                       </div>
                       <div className="py-1">
-                        {filteredSubmenu.map((subItem) => {
+                        {filteredSubmenu.map((subItem: any) => {
                           const SubIcon = subItem.icon;
                           return (
                             <Link
@@ -431,7 +431,7 @@ export default function Navigation({ userRole, isAuthenticated }: NavigationProp
                       />
                     ) : null}
                     <div className={`w-full h-full flex items-center justify-center text-white font-semibold text-sm ${(profile?.foto_url || profile?.avatar) ? 'hidden' : 'flex'}`}>
-                      {currentUserName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                      {currentUserName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
                   </div>
                   <div className="text-sm">

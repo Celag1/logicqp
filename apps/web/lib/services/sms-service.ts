@@ -31,7 +31,7 @@ async function getSMSConfig(): Promise<SMSConfig> {
     }
 
     const config: any = {};
-    data.forEach(item => {
+    data.forEach((item: any) => {
       config[item.clave] = item.valor;
     });
 

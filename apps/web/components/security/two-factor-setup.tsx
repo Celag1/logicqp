@@ -22,7 +22,7 @@ import {
   EyeOff,
   Loader2
 } from "lucide-react";
-import { twoFactorAuthService, TwoFactorSetup, TwoFactorConfig } from "@/lib/services/two-factor-auth";
+import { twoFactorAuthService, type TwoFactorSetup, type TwoFactorConfig } from "@/lib/services/two-factor-auth";
 
 interface TwoFactorSetupProps {
   userId: string;

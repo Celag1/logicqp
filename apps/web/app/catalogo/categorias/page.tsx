@@ -86,7 +86,7 @@ export default function CategoriasPage() {
 
           const productCount = productos?.length || 0;
           const averagePrice = productCount > 0 
-            ? productos.reduce((sum: number, p: any) => sum + (p.precio || 0), 0) / productCount
+            ? (productos || []).reduce((sum: number, p: any) => sum + (p.precio || 0), 0) / productCount
             : 0;
 
           return {
@@ -176,7 +176,7 @@ export default function CategoriasPage() {
     let filtered = categories;
 
     if (searchTerm) {
-      filtered = filtered.filter(category =>
+      filtered = filtered.filter((category: any) =>
         category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         category.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -190,11 +190,11 @@ export default function CategoriasPage() {
   }, []);
 
   const getTotalProducts = () => {
-    return categories.reduce((total, category) => total + category.productCount, 0);
+    return categories.reduce((total: number, category: any) => total + category.productCount, 0);
   };
 
   const getAveragePrice = () => {
-    const totalPrice = categories.reduce((total, category) => total + category.averagePrice, 0);
+    const totalPrice = categories.reduce((total: number, category: any) => total + category.averagePrice, 0);
     return categories.length > 0 ? totalPrice / categories.length : 0;
   };
 
@@ -311,7 +311,7 @@ export default function CategoriasPage() {
         {/* Lista de Categorías */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCategories.map((category) => (
+            {filteredCategories.map((category: any) => (
               <Card key={category.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
                 <CardContent className="p-6">
                   <div className="text-center">
@@ -346,7 +346,7 @@ export default function CategoriasPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredCategories.map((category) => (
+            {filteredCategories.map((category: any) => (
               <Card key={category.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4">

@@ -5,7 +5,7 @@ export const performanceMonitor = {
     if (typeof window === 'undefined') return;
     
     const navigation = performance.getEntriesByType('navigation')[0];
-    return navigation ? navigation.loadEventEnd - navigation.loadEventStart : 0;
+    return navigation ? (navigation as any).loadEventEnd - (navigation as any).loadEventStart : 0;
   },
   
   // Métricas de memoria
@@ -27,8 +27,8 @@ export const performanceMonitor = {
     const resources = performance.getEntriesByType('resource');
     return {
       totalRequests: resources.length,
-      totalSize: resources.reduce((total, resource) => total + (resource.transferSize || 0), 0),
-      averageTime: resources.reduce((total, resource) => total + resource.duration, 0) / resources.length
+      totalSize: resources.reduce((total: number, resource: any) => total + ((resource as any).transferSize || 0), 0),
+      averageTime: resources.reduce((total: number, resource: any) => total + resource.duration, 0) / resources.length
     };
   }
 };

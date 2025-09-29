@@ -41,7 +41,7 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
 
   // Ordenar y limitar datos
   const sortedData = [...(data || [])]
-    .filter(d => d && d.nombre) // Filtrar datos válidos
+    .filter((d: any) => d && d.nombre) // Filtrar datos válidos
     .sort((a, b) => (b?.[sortBy] || 0) - (a?.[sortBy] || 0))
     .slice(0, maxItems);
 
@@ -71,16 +71,16 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
         ];
 
         const chartData = {
-          labels: sortedData.map(d => d?.nombre ? (d.nombre.length > 20 ? d.nombre.substring(0, 20) + '...' : d.nombre) : 'Sin nombre'),
+          labels: sortedData.map((d: any) => d?.nombre ? (d.nombre.length > 20 ? d.nombre.substring(0, 20) + '...' : d.nombre) : 'Sin nombre'),
           datasets: [
             {
               label: 'Ventas',
-              data: sortedData.map(d => d?.ventas || 0),
+              data: sortedData.map((d: any) => d?.ventas || 0),
               backgroundColor: chartType === 'bar' ? colors[0] : colors.slice(0, sortedData.length),
               borderColor: chartType === 'bar' ? colors[0] : colors.slice(0, sortedData.length),
               borderWidth: chartType === 'bar' ? 0 : 2,
               borderRadius: chartType === 'bar' ? 4 : 0,
-              hoverBackgroundColor: chartType === 'bar' ? '#2563eb' : colors.slice(0, sortedData.length).map(c => c + '80'),
+              hoverBackgroundColor: chartType === 'bar' ? '#2563eb' : colors.slice(0, sortedData.length).map((c: string) => c + '80'),
             }
           ]
         };
@@ -180,8 +180,8 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
     }
   };
 
-  const totalVentas = sortedData.reduce((sum, item) => sum + (item?.ventas || 0), 0);
-  const promedioCrecimiento = sortedData.length > 0 ? sortedData.reduce((sum, item) => sum + (item?.crecimiento || 0), 0) / sortedData.length : 0;
+  const totalVentas = sortedData.reduce((sum: number, item: any) => sum + (item?.ventas || 0), 0);
+  const promedioCrecimiento = sortedData.length > 0 ? sortedData.reduce((sum: number, item: any) => sum + (item?.crecimiento || 0), 0) / sortedData.length : 0;
 
   return (
     <Card className="border-0 shadow-lg">
@@ -252,7 +252,7 @@ export function ProductsChart({ data = mockProductsData, maxItems = 10 }: Produc
         </div>
         
         <div className="mt-4 space-y-3">
-          {sortedData.slice(0, 5).map((product, index) => (
+          {sortedData.slice(0, 5).map((product: any, index: number) => (
             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">

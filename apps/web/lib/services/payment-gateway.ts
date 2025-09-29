@@ -87,7 +87,7 @@ class PaymentGatewayService {
     return [
       {
         id: 'stripe_card',
-        type: 'card',
+        type: 'card' as const,
         name: 'Tarjeta de Crédito/Débito',
         description: 'Visa, Mastercard, American Express',
         icon: 'credit-card',
@@ -97,7 +97,7 @@ class PaymentGatewayService {
       },
       {
         id: 'paypal',
-        type: 'transfer',
+        type: 'transfer' as const,
         name: 'PayPal',
         description: 'Paga con tu cuenta PayPal',
         icon: 'paypal',
@@ -107,7 +107,7 @@ class PaymentGatewayService {
       },
       {
         id: 'mercadopago',
-        type: 'transfer',
+        type: 'transfer' as const,
         name: 'MercadoPago',
         description: 'Pago seguro con MercadoPago',
         icon: 'mercadopago',
@@ -117,7 +117,7 @@ class PaymentGatewayService {
       },
       {
         id: 'bank_transfer',
-        type: 'transfer',
+        type: 'transfer' as const,
         name: 'Transferencia Bancaria',
         description: 'Transferencia directa a cuenta bancaria',
         icon: 'bank',
@@ -127,7 +127,7 @@ class PaymentGatewayService {
       },
       {
         id: 'cash',
-        type: 'cash',
+        type: 'cash' as const,
         name: 'Efectivo',
         description: 'Pago en efectivo al recibir',
         icon: 'dollar-sign',
@@ -135,7 +135,7 @@ class PaymentGatewayService {
         fees: { percentage: 0, fixed: 0 },
         processingTime: 'Al recibir'
       }
-    ].filter(method => method.enabled);
+    ].filter((method: any) => method.enabled);
   }
 
   /**

@@ -511,7 +511,7 @@ class ReportSchedulerService {
    * Calcular resumen de ventas
    */
   private calculateSalesSummary(data: any[]): any {
-    const totalAmount = data.reduce((sum, item) => sum + (item.total || 0), 0);
+    const totalAmount = data.reduce((sum: number, item: any) => sum + (item.total || 0), 0);
     const totalRecords = data.length;
     
     return {
@@ -527,7 +527,7 @@ class ReportSchedulerService {
    */
   private calculateInventorySummary(data: any[]): any {
     const totalRecords = data.length;
-    const lowStock = data.filter(item => item.stock_disponible <= item.stock_minimo).length;
+    const lowStock = data.filter((item: any) => item.stock_disponible <= item.stock_minimo).length;
     
     return {
       total_records: totalRecords,
@@ -540,7 +540,7 @@ class ReportSchedulerService {
    * Calcular resumen financiero
    */
   private calculateFinancialSummary(data: any[]): any {
-    const totalAmount = data.reduce((sum, item) => sum + (item.total || 0), 0);
+    const totalAmount = data.reduce((sum: number, item: any) => sum + (item.total || 0), 0);
     const totalRecords = data.length;
     
     return {

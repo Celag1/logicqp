@@ -39,17 +39,17 @@ class LocalDatabase {
     // Usuario administrador por defecto
     const adminUser = {
       id: 'admin-1',
-      email: 'admin@logicqp.com',
-      password: 'admin123',
+      email: 'celag3@gmail.com',
+      password: 'Ibot1801538719',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
     const adminProfile = {
       id: 'admin-1',
-      email: 'admin@logicqp.com',
-      nombre: 'Administrador',
-      apellido: 'LogicQP',
+      email: 'celag3@gmail.com',
+      nombre: 'Celso',
+      apellido: 'Aguirre',
       rol: 'super_admin',
       telefono: '+1234567890',
       direccion: 'Calle Principal 123',

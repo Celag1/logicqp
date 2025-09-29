@@ -158,7 +158,7 @@ class BarcodeInventoryService {
         return [];
       }
 
-      return data?.map(item => this.mapToBarcodeProduct(item)) || [];
+      return data?.map((item: any) => this.mapToBarcodeProduct(item)) || [];
 
     } catch (error) {
       console.error('❌ Error en findSimilarProducts:', error);
@@ -429,7 +429,7 @@ class BarcodeInventoryService {
         return [];
       }
 
-      return data?.map(item => this.mapToBarcodeProduct(item)) || [];
+      return data?.map((item: any) => this.mapToBarcodeProduct(item)) || [];
 
     } catch (error) {
       console.error('❌ Error en getLowStockProducts:', error);

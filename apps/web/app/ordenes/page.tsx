@@ -146,7 +146,7 @@ export default function OrdenesPage() {
     let filtered = orders;
 
     if (searchTerm) {
-      filtered = filtered.filter(order => 
+      filtered = filtered.filter((order: any) => 
         order.numero_orden.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.cliente_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.cliente_email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -154,11 +154,11 @@ export default function OrdenesPage() {
     }
 
     if (statusFilter !== "todos") {
-      filtered = filtered.filter(order => order.estado === statusFilter);
+      filtered = filtered.filter((order: any) => order.estado === statusFilter);
     }
 
     if (paymentFilter !== "todos") {
-      filtered = filtered.filter(order => order.metodo_pago === paymentFilter);
+      filtered = filtered.filter((order: any) => order.metodo_pago === paymentFilter);
     }
 
     if (dateFilter !== "todos") {
@@ -168,15 +168,15 @@ export default function OrdenesPage() {
       switch (dateFilter) {
         case "hoy":
           filterDate.setHours(0, 0, 0, 0);
-          filtered = filtered.filter(order => new Date(order.created_at) >= filterDate);
+          filtered = filtered.filter((order: any) => new Date(order.created_at) >= filterDate);
           break;
         case "semana":
           filterDate.setDate(now.getDate() - 7);
-          filtered = filtered.filter(order => new Date(order.created_at) >= filterDate);
+          filtered = filtered.filter((order: any) => new Date(order.created_at) >= filterDate);
           break;
         case "mes":
           filterDate.setMonth(now.getMonth() - 1);
-          filtered = filtered.filter(order => new Date(order.created_at) >= filterDate);
+          filtered = filtered.filter((order: any) => new Date(order.created_at) >= filterDate);
           break;
       }
     }
@@ -234,7 +234,7 @@ export default function OrdenesPage() {
     setLoading(true);
     // Simular actualización de estado
     setTimeout(() => {
-      setOrders(orders.map(order => 
+      setOrders(orders.map((order: any) => 
         order.id === orderId 
           ? { ...order, estado: newStatus as any, updated_at: new Date().toISOString() }
           : order
@@ -272,21 +272,21 @@ export default function OrdenesPage() {
       reportContainer.style.lineHeight = '1.4';
       
       // Calcular estadísticas adicionales
-      const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+      const totalRevenue = filteredOrders.reduce((sum: number, order: any) => sum + order.total, 0);
       const avgOrderValue = filteredOrders.length > 0 ? totalRevenue / filteredOrders.length : 0;
-      const completedOrders = filteredOrders.filter(order => order.estado === 'entregada').length;
-      const pendingOrders = filteredOrders.filter(order => order.estado === 'pendiente').length;
-      const inProcessOrders = filteredOrders.filter(order => order.estado === 'en_proceso').length;
-      const cancelledOrders = filteredOrders.filter(order => order.estado === 'cancelada').length;
+      const completedOrders = filteredOrders.filter((order: any) => order.estado === 'entregada').length;
+      const pendingOrders = filteredOrders.filter((order: any) => order.estado === 'pendiente').length;
+      const inProcessOrders = filteredOrders.filter((order: any) => order.estado === 'en_proceso').length;
+      const cancelledOrders = filteredOrders.filter((order: any) => order.estado === 'cancelada').length;
       
       // Análisis por método de pago
-      const paymentMethods = filteredOrders.reduce((acc, order) => {
+      const paymentMethods = filteredOrders.reduce((acc: any, order: any) => {
         acc[order.metodo_pago] = (acc[order.metodo_pago] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       
       // Top clientes por valor
-      const topClients = filteredOrders.reduce((acc, order) => {
+      const topClients = filteredOrders.reduce((acc: any, order: any) => {
         if (!acc[order.cliente_nombre]) {
           acc[order.cliente_nombre] = { orders: 0, total: 0 };
         }
@@ -296,8 +296,8 @@ export default function OrdenesPage() {
       }, {} as Record<string, { orders: number; total: number }>);
       
       const topClientsArray = Object.entries(topClients)
-        .map(([name, data]) => ({ name, ...data }))
-        .sort((a, b) => b.total - a.total)
+        .map(([name, data]: [string, any]) => ({ name, ...data }))
+        .sort((a: any, b: any) => b.total - a.total)
         .slice(0, 5);
       
       // Crear encabezado profesional del reporte
@@ -373,7 +373,7 @@ export default function OrdenesPage() {
               </tr>
             </thead>
             <tbody>
-              ${Object.entries(paymentMethods).map(([method, count], index) => `
+              ${Object.entries(paymentMethods).map(([method, count]: [string, any], index: number) => `
                 <tr style="background: ${index % 2 === 0 ? '#f8fafc' : '#f1f5f9'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">${getPaymentLabel(method as any)}</td>
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #8b5cf6; text-align: center;">${count} órdenes</td>
@@ -398,7 +398,7 @@ export default function OrdenesPage() {
               </tr>
             </thead>
             <tbody>
-              ${topClientsArray.map((client, index) => `
+              ${topClientsArray.map((client: any, index: number) => `
                 <tr style="background: ${index === 0 ? '#fef3c7' : index === 1 ? '#f3e8ff' : index === 2 ? '#dbeafe' : '#f0fdf4'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">
                     ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'} ${client.name}
@@ -428,7 +428,7 @@ export default function OrdenesPage() {
               </tr>
             </thead>
             <tbody>
-              ${filteredOrders.map((order, index) => `
+              ${filteredOrders.map((order: any, index: number) => `
                 <tr style="background: ${order.estado === 'entregada' ? '#f0fdf4' : order.estado === 'pendiente' ? '#fffbeb' : order.estado === 'en_proceso' ? '#eff6ff' : '#fef2f2'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">${order.numero_orden}</td>
                   <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151;">${order.cliente_nombre}</td>
@@ -560,7 +560,7 @@ export default function OrdenesPage() {
     try {
       const csvContent = [
         ['Número Orden', 'Cliente', 'Email', 'Total', 'Estado', 'Método Pago', 'Fecha'],
-        ...filteredOrders.map(order => [
+        ...filteredOrders.map((order: any) => [
           order.numero_orden,
           order.cliente_nombre,
           order.cliente_email,
@@ -569,7 +569,7 @@ export default function OrdenesPage() {
           getPaymentLabel(order.metodo_pago),
           new Date(order.created_at).toLocaleDateString()
         ])
-      ].map(row => row.join(',')).join('\n');
+      ].map((row: any) => row.join(',')).join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -726,10 +726,10 @@ export default function OrdenesPage() {
 
   const stats = {
     total: orders.length,
-    pendientes: orders.filter(o => o.estado === 'pendiente').length,
-    enProceso: orders.filter(o => o.estado === 'en_proceso').length,
-    entregadas: orders.filter(o => o.estado === 'entregada').length,
-    totalVentas: orders.reduce((sum, order) => sum + order.total, 0)
+    pendientes: orders.filter((o: any) => o.estado === 'pendiente').length,
+    enProceso: orders.filter((o: any) => o.estado === 'en_proceso').length,
+    entregadas: orders.filter((o: any) => o.estado === 'entregada').length,
+    totalVentas: orders.reduce((sum: number, order: any) => sum + order.total, 0)
   };
 
   // Mostrar indicador de carga
@@ -925,7 +925,7 @@ export default function OrdenesPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => {
+                {filteredOrders.map((order: any) => {
                   const StatusIcon = getStatusIcon(order.estado);
                   return (
                     <tr key={order.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -1077,7 +1077,7 @@ export default function OrdenesPage() {
               <div>
                 <h4 className="font-medium text-gray-900 dark:text-white mb-3">Productos</h4>
                 <div className="space-y-2">
-                  {selectedOrder.items.map((item) => (
+                  {selectedOrder.items.map((item: any) => (
                     <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div>
                         <p className="font-medium">{item.producto_nombre}</p>

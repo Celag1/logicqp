@@ -139,11 +139,11 @@ export default function InventarioPage() {
       setFilteredInventory(inventoryData);
 
       // Cargar categorías únicas
-      const uniqueCategories = ['Todas', ...Array.from(new Set(inventoryData.map(item => item.categoria)))];
+      const uniqueCategories = ['Todas', ...Array.from(new Set(inventoryData.map((item: any) => item.categoria)))];
       setCategories(uniqueCategories);
 
       // Cargar proveedores únicos
-      const uniqueSuppliers = ['Todos', ...Array.from(new Set(inventoryData.map(item => item.proveedor)))];
+      const uniqueSuppliers = ['Todos', ...Array.from(new Set(inventoryData.map((item: any) => item.proveedor)))];
       setSuppliers(uniqueSuppliers);
 
     } catch (error) {
@@ -164,7 +164,7 @@ export default function InventarioPage() {
 
     // Filtro por búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(item => {
+      filtered = filtered.filter((item: any) => {
         const searchLower = searchTerm.toLowerCase();
         return (
           item.nombre.toLowerCase().includes(searchLower) ||
@@ -178,27 +178,27 @@ export default function InventarioPage() {
 
     // Filtro por categoría
     if (selectedCategory !== "Todas") {
-      filtered = filtered.filter(item => item.categoria === selectedCategory);
+      filtered = filtered.filter((item: any) => item.categoria === selectedCategory);
     }
 
     // Filtro por proveedor
     if (selectedSupplier !== "Todos") {
-      filtered = filtered.filter(item => item.proveedor === selectedSupplier);
+      filtered = filtered.filter((item: any) => item.proveedor === selectedSupplier);
     }
 
     // Filtro por stock
     switch (stockFilter) {
       case "bajo":
-        filtered = filtered.filter(item => item.stock_actual <= item.stock_minimo);
+        filtered = filtered.filter((item: any) => item.stock_actual <= item.stock_minimo);
         break;
       case "agotado":
-        filtered = filtered.filter(item => item.stock_actual === 0);
+        filtered = filtered.filter((item: any) => item.stock_actual === 0);
         break;
       case "exceso":
-        filtered = filtered.filter(item => item.stock_actual > item.stock_maximo);
+        filtered = filtered.filter((item: any) => item.stock_actual > item.stock_maximo);
         break;
       case "normal":
-        filtered = filtered.filter(item => 
+        filtered = filtered.filter((item: any) => 
           item.stock_actual > item.stock_minimo && 
           item.stock_actual <= item.stock_maximo
         );
@@ -272,7 +272,7 @@ export default function InventarioPage() {
         Total de productos: ${inventory.length}
         
         PRODUCTOS:
-        ${inventory.map(item => `
+        ${inventory.map((item: any) => `
         - ${item.nombre}
           Código: ${item.codigo}
           Stock: ${item.stock_actual}
@@ -304,10 +304,10 @@ export default function InventarioPage() {
 
   const getInventoryStats = () => {
     const total = inventory.length;
-    const activos = inventory.filter(item => item.estado === 'activo').length;
-    const stockBajo = inventory.filter(item => item.stock_actual <= item.stock_minimo).length;
-    const agotados = inventory.filter(item => item.stock_actual === 0).length;
-    const valorTotal = inventory.reduce((total, item) => total + (item.precio_compra * item.stock_actual), 0);
+    const activos = inventory.filter((item: any) => item.estado === 'activo').length;
+    const stockBajo = inventory.filter((item: any) => item.stock_actual <= item.stock_minimo).length;
+    const agotados = inventory.filter((item: any) => item.stock_actual === 0).length;
+    const valorTotal = inventory.reduce((total: number, item: any) => total + (item.precio_compra * item.stock_actual), 0);
 
     return { 
       totalProducts: total, 
@@ -349,15 +349,15 @@ export default function InventarioPage() {
       reportContainer.style.lineHeight = '1.4';
       
       // Calcular estadísticas adicionales
-      const categories = Array.from(new Set(filteredInventory.map(item => item.categoria)));
-      const suppliers = Array.from(new Set(filteredInventory.map(item => item.proveedor)));
-      const avgPrice = filteredInventory.reduce((sum, item) => sum + item.precio_venta, 0) / filteredInventory.length;
-      const totalStockValue = filteredInventory.reduce((sum, item) => sum + (item.precio_compra * item.stock_actual), 0);
-      const lowStockItems = filteredInventory.filter(item => item.stock_actual <= item.stock_minimo);
-      const outOfStockItems = filteredInventory.filter(item => item.stock_actual === 0);
-      const topCategories = categories.map(cat => {
-        const items = filteredInventory.filter(item => item.categoria === cat);
-        const totalValue = items.reduce((sum, item) => sum + (item.precio_venta * item.stock_actual), 0);
+      const categories = Array.from(new Set(filteredInventory.map((item: any) => item.categoria)));
+      const suppliers = Array.from(new Set(filteredInventory.map((item: any) => item.proveedor)));
+      const avgPrice = filteredInventory.reduce((sum: number, item: any) => sum + item.precio_venta, 0) / filteredInventory.length;
+      const totalStockValue = filteredInventory.reduce((sum: number, item: any) => sum + (item.precio_compra * item.stock_actual), 0);
+      const lowStockItems = filteredInventory.filter((item: any) => item.stock_actual <= item.stock_minimo);
+      const outOfStockItems = filteredInventory.filter((item: any) => item.stock_actual === 0);
+      const topCategories = categories.map((cat: string) => {
+        const items = filteredInventory.filter((item: any) => item.categoria === cat);
+        const totalValue = items.reduce((sum: number, item: any) => sum + (item.precio_venta * item.stock_actual), 0);
         return { categoria: cat, items: items.length, valor: totalValue };
       }).sort((a, b) => b.valor - a.valor);
       
@@ -425,7 +425,7 @@ export default function InventarioPage() {
           <h2 style="color: #1e40af; border-bottom: 3px solid #dbeafe; padding-bottom: 12px; font-size: 20px; background: linear-gradient(90deg, #eff6ff, transparent); padding: 15px; border-radius: 8px;">
             🚨 ALERTAS CRÍTICAS DE INVENTARIO
           </h2>
-          ${lowStockItems.length > 0 ? lowStockItems.map((item, index) => `
+          ${lowStockItems.length > 0 ? lowStockItems.map((item: any, index: number) => `
             <div style="background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 2px solid #fecaca; border-radius: 10px; padding: 18px; margin: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
               <div style="color: #dc2626; font-weight: bold; margin-bottom: 8px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">🚨 ${item.nombre}</div>
               <div style="font-size: 12px; margin: 4px 0; color: #7f1d1d;"><strong>📂 Categoría:</strong> ${item.categoria}</div>
@@ -457,7 +457,7 @@ export default function InventarioPage() {
               </tr>
             </thead>
             <tbody>
-              ${topCategories.map((cat, index) => `
+              ${topCategories.map((cat: any, index: number) => `
                 <tr style="background: ${index === 0 ? '#fef3c7' : index === 1 ? '#f3e8ff' : index === 2 ? '#dbeafe' : '#f0fdf4'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">
                     ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📦'} ${cat.categoria}
@@ -487,7 +487,7 @@ export default function InventarioPage() {
               </tr>
             </thead>
             <tbody>
-              ${filteredInventory.map((item, index) => `
+              ${filteredInventory.map((item: any, index: number) => `
                 <tr style="background: ${item.estado === 'activo' ? '#f0fdf4' : item.estado === 'inactivo' ? '#fffbeb' : '#eff6ff'};">
                   <td style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #1f2937;">${item.codigo}</td>
                   <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151;">${item.nombre.length > 25 ? item.nombre.substring(0, 25) + '...' : item.nombre}</td>
@@ -621,7 +621,7 @@ export default function InventarioPage() {
       // Crear datos para Excel (CSV)
       const csvData = [
         ['Código', 'Producto', 'Categoría', 'Marca', 'Stock Actual', 'Stock Mínimo', 'Stock Máximo', 'Precio Compra', 'Precio Venta', 'Proveedor', 'Ubicación', 'Estado', 'Última Actualización'],
-        ...filteredInventory.map(item => [
+        ...filteredInventory.map((item: any) => [
           item.codigo,
           item.nombre,
           item.categoria,
@@ -639,7 +639,7 @@ export default function InventarioPage() {
       ];
       
       // Convertir a CSV
-      const csvContent = csvData.map(row => row.join(',')).join('\n');
+      const csvContent = csvData.map((row: any) => row.join(',')).join('\n');
       
       // Crear y descargar archivo
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -986,7 +986,7 @@ export default function InventarioPage() {
                 <SelectValue placeholder="Categoría" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category) => (
+                {categories.map((category: string) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
@@ -999,7 +999,7 @@ export default function InventarioPage() {
                 <SelectValue placeholder="Proveedor" />
               </SelectTrigger>
               <SelectContent>
-                {suppliers.map((supplier) => (
+                {suppliers.map((supplier: string) => (
                   <SelectItem key={supplier} value={supplier}>
                     {supplier}
                   </SelectItem>
@@ -1091,7 +1091,7 @@ export default function InventarioPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredInventory.map((item) => {
+                  {filteredInventory.map((item: any) => {
                     const stockStatus = getStockStatus(item);
                     const CategoryIcon = getCategoryIcon(item.categoria);
                     

@@ -152,25 +152,14 @@ export default function CatalogoPage() {
       );
 
       console.log('📡 Ejecutando consulta a Supabase...');
-      // Crear un cliente de Supabase sin autenticación para la consulta de productos
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabasePublic = createClient(
-        'http://127.0.0.1:54321',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
-      );
+      // Usar la configuración centralizada de Supabase
+      const { supabase: supabasePublic } = await import('@/lib/supabase');
       
       const queryPromise = supabasePublic
         .from('productos')
-        .select(`
-          *,
-          categorias(nombre),
-          proveedores(nombre),
-          lotes(
-            id,
-            cantidad_disponible,
-            fecha_vencimiento
-          )
-        `);
+        .select('*')
+        .eq('activo', true)
+        .order('nombre');
 
       const { data: productos, error: productosError } = await Promise.race([
         queryPromise,
@@ -215,7 +204,7 @@ export default function CatalogoPage() {
       setProducts(realProducts);
       setFilteredProducts(realProducts);
 
-      const uniqueCategories = ['Todas', ...Array.from(new Set(realProducts.map(p => p.categoria)))];
+      const uniqueCategories = ['Todas', ...Array.from(new Set(realProducts.map((p: any) => p.categoria)))];
       setCategories(uniqueCategories);
 
       console.log('✅ Productos cargados exitosamente:', realProducts.length);
@@ -242,7 +231,7 @@ export default function CatalogoPage() {
 
     // Filtro por búsqueda
     if (searchTerm) {
-      filtered = filtered.filter(product =>
+      filtered = filtered.filter((product: any) =>
         product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.marca.toLowerCase().includes(searchTerm.toLowerCase())
@@ -251,17 +240,17 @@ export default function CatalogoPage() {
 
     // Filtro por categoría
     if (selectedCategory !== 'Todas') {
-      filtered = filtered.filter(product => product.categoria === selectedCategory);
+      filtered = filtered.filter((product: any) => product.categoria === selectedCategory);
     }
 
     // Filtro por rango de precio
-    filtered = filtered.filter(product => 
+    filtered = filtered.filter((product: any) => 
       product.precio >= priceRange[0] && product.precio <= priceRange[1]
     );
 
     // Filtro por marcas
     if (selectedBrands.length > 0) {
-      filtered = filtered.filter(product => selectedBrands.includes(product.marca));
+      filtered = filtered.filter((product: any) => selectedBrands.includes(product.marca));
     }
 
     // Ordenamiento
@@ -290,9 +279,9 @@ export default function CatalogoPage() {
   // Estadísticas
   const stats = useMemo(() => {
     const totalProducts = products.length;
-    const totalValue = products.reduce((sum, product) => sum + (product.precio * product.stock_disponible), 0);
-    const avgRating = products.reduce((sum, product) => sum + product.rating, 0) / totalProducts || 0;
-    const lowStock = products.filter(product => product.stock_disponible < 10).length;
+    const totalValue = products.reduce((sum: number, product: any) => sum + (product.precio * product.stock_disponible), 0);
+    const avgRating = products.reduce((sum: number, product: any) => sum + product.rating, 0) / totalProducts || 0;
+    const lowStock = products.filter((product: any) => product.stock_disponible < 10).length;
 
     return { totalProducts, totalValue, avgRating, lowStock };
   }, [products]);
@@ -316,7 +305,7 @@ export default function CatalogoPage() {
       }
 
       if (existingItem) {
-        return prev.map(item =>
+        return prev.map((item: any) =>
           item.product.id === product.id
             ? { ...item, quantity: newQuantity, subtotal: newQuantity * product.precio }
             : item
@@ -341,7 +330,7 @@ export default function CatalogoPage() {
     }
 
     setCart(prev =>
-      prev.map(item =>
+      prev.map((item: any) =>
         item.product.id === productId
           ? { ...item, quantity, subtotal: quantity * item.product.precio }
           : item
@@ -350,7 +339,7 @@ export default function CatalogoPage() {
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.product.id !== productId));
+    setCart(prev => prev.filter((item: any) => item.product.id !== productId));
   };
 
   const clearCart = () => {
@@ -364,9 +353,9 @@ export default function CatalogoPage() {
     }
     
     // Validar que todos los productos tengan stock suficiente
-    const outOfStock = cart.filter(item => item.quantity > item.product.stock_disponible);
+    const outOfStock = cart.filter((item: any) => item.quantity > item.product.stock_disponible);
     if (outOfStock.length > 0) {
-      alert(`❌ Los siguientes productos no tienen stock suficiente:\n${outOfStock.map(item => `- ${item.product.nombre} (disponible: ${item.product.stock_disponible})`).join('\n')}`);
+      alert(`❌ Los siguientes productos no tienen stock suficiente:\n${outOfStock.map((item: any) => `- ${item.product.nombre} (disponible: ${item.product.stock_disponible})`).join('\n')}`);
       return;
     }
     
@@ -580,13 +569,13 @@ export default function CatalogoPage() {
   const handleToggleFavorite = (product: Product) => {
     setFavorites(prev => 
       prev.includes(product.id) 
-        ? prev.filter(id => id !== product.id)
+        ? prev.filter((id: any) => id !== product.id)
         : [...prev, product.id]
     );
   };
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+  const cartCount = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
+  const cartTotal = cart.reduce((sum: number, item: any) => sum + item.subtotal, 0);
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { text: 'Agotado', color: 'destructive' };
@@ -663,7 +652,7 @@ export default function CatalogoPage() {
                   <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {categories.map((category: string) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
@@ -716,7 +705,7 @@ export default function CatalogoPage() {
               ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" 
               : "space-y-6"
             }>
-              {filteredProducts.map((product, index) => (
+              {filteredProducts.map((product: any, index: number) => (
                 <Card key={product.id} className="group hover:shadow-2xl transition-all duration-500 border-0 bg-white/95 backdrop-blur-sm overflow-hidden relative">
                   {/* Badge de Destacado */}
                   {index < 3 && (
@@ -796,7 +785,7 @@ export default function CatalogoPage() {
                         {/* Rating Premium */}
                         <div className="flex items-center gap-2 mb-4">
                           <div className="flex">
-                            {[...Array(5)].map((_, i) => (
+                            {[...Array(5)].map((_: any, i: number) => (
                               <Star
                                 key={i}
                                 className={`h-4 w-4 transition-colors ${
@@ -890,7 +879,7 @@ export default function CatalogoPage() {
                   <div className="flex flex-col h-full">
                     {/* Lista de productos en el carrito Premium */}
                     <div className="space-y-3">
-                      {cart.map((item) => (
+                      {cart.map((item: any) => (
                         <div key={item.product.id} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300">
                           <div className="w-12 h-12 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
                             <span className="text-xl">💊</span>

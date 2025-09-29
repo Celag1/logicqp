@@ -254,7 +254,7 @@ class AdvancedSearchService {
       const suggestions: SearchSuggestion[] = [];
 
       // Agregar sugerencias de productos
-      products?.forEach(product => {
+      products?.forEach((product: any) => {
         suggestions.push({
           id: `product-${product.nombre}`,
           text: product.nombre,
@@ -264,7 +264,7 @@ class AdvancedSearchService {
       });
 
       // Agregar sugerencias de categorías
-      categories?.forEach(category => {
+      categories?.forEach((category: any) => {
         suggestions.push({
           id: `category-${category.nombre}`,
           text: category.nombre,
@@ -313,7 +313,7 @@ class AdvancedSearchService {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      const popular: SearchSuggestion[] = data?.map((product, index) => ({
+      const popular: SearchSuggestion[] = data?.map((product: any, index: number) => ({
         id: `popular-${index}`,
         text: product.nombre,
         type: 'product',
@@ -334,18 +334,18 @@ class AdvancedSearchService {
     return query
       .toLowerCase()
       .split(/\s+/)
-      .filter(term => term.length > 0);
+      .filter((term: string) => term.length > 0);
   }
 
   private buildSearchConditions(terms: string[]): string {
-    const conditions = terms.map(term => 
+    const conditions = terms.map((term: string) => 
       `nombre.ilike.%${term}%,descripcion.ilike.%${term}%,codigo.ilike.%${term}%,categoria.ilike.%${term}%,marca.ilike.%${term}%`
     );
     return conditions.join(',');
   }
 
   private processSearchResults(data: any[], query: string): SearchResult[] {
-    return data.map(item => ({
+    return data.map((item: any) => ({
       id: item.id,
       type: 'product' as const,
       title: item.nombre,
@@ -455,7 +455,7 @@ class AdvancedSearchService {
       };
 
       // Agregar al inicio y mantener solo los últimos N elementos
-      const updatedHistory = [newEntry, ...history.filter(h => h.query !== query)].slice(0, this.maxHistoryItems);
+      const updatedHistory = [newEntry, ...history.filter((h: any) => h.query !== query)].slice(0, this.maxHistoryItems);
       
       localStorage.setItem(this.searchHistoryKey, JSON.stringify(updatedHistory));
     } catch (error) {
