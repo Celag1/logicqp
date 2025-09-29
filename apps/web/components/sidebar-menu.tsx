@@ -103,6 +103,12 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
     console.log('🔧 Forzando rol super_admin para admin@logicqp.com');
   }
   
+  // Verificación adicional: Si el perfil tiene rol super_admin, asegurar que se use
+  if (profile?.rol === 'super_admin') {
+    currentUserRole = 'super_admin';
+    console.log('🔧 Confirmando rol super_admin desde perfil');
+  }
+  
   console.log('  currentUserRole final:', currentUserRole);
 
 
@@ -243,11 +249,19 @@ export default function SidebarMenu({ userRole = "cliente", isAuthenticated = fa
           {/* Navigation Sections */}
           <div className="space-y-4">
             {navigationSections.map((section: any) => {
-              const filteredItems = section.items.filter((item: any) => {
-                if (item.public) return true;
-                if (item.roles && item.roles.includes(currentUserRole)) return true;
-                return false;
-              });
+              // Para super admin, mostrar todos los elementos
+              let filteredItems;
+              if (currentUserRole === 'super_admin') {
+                filteredItems = section.items;
+                console.log(`🔧 Super admin - Mostrando todos los elementos de ${section.title}:`, filteredItems.length);
+              } else {
+                filteredItems = section.items.filter((item: any) => {
+                  if (item.public) return true;
+                  if (item.roles && item.roles.includes(currentUserRole)) return true;
+                  return false;
+                });
+              }
+              
               if (filteredItems.length === 0) return null;
 
               const isExpanded = expandedSections.includes(section.title);
